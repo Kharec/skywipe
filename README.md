@@ -54,7 +54,7 @@ It looks like this :
 
 ```yaml
 handle: your_handle
-password: your_password
+password: your_password_encrypted
 batch_size: 10
 delay: 1
 verbose: true
