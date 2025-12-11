@@ -48,9 +48,7 @@ uv run main.py follows        # only follows
 
 ### Configuration
 
-If you run the tool for the first time, it will prompt you to use `skywipe configure` to create the configuration file, which is located in `~/.config/skywipe/`.
-
-It looks like this :
+If you run the tool for the first time, it will prompt you to use `skywipe configure` to create the configuration file, which is located in `~/.config/skywipe/config.yml` :
 
 ```yaml
 handle: your_handle
