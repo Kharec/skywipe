@@ -1,6 +1,6 @@
 """Command implementations for Skywipe CLI."""
 
-from skywipe.configuration import Configuration
+from skywipe.configure import Configuration
 
 
 def run_configure():

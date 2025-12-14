@@ -4,7 +4,7 @@ import sys
 import argparse
 
 from skywipe.commands import run_configure
-from skywipe.configuration import Configuration
+from skywipe.configure import Configuration
 
 
 COMMANDS = {
