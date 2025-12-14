@@ -5,12 +5,12 @@ from skywipe.configure import Configuration
 
 
 class Auth:
-    def __init__(self, configuration: Configuration = None):
-        self.configuration = configuration or Configuration()
-        self.client: Client = None
+    def __init__(self):
+        self.config = Configuration()
+        self.client = None
 
     def login(self) -> Client:
-        config_data = self.configuration.load()
+        config_data = self.config.load()
 
         handle = config_data.get("handle")
         password = config_data.get("password")
@@ -23,3 +23,6 @@ class Auth:
         self.client.login(handle, password)
 
         return self.client
+
+    def is_logged(self) -> bool:
+        return bool(getattr(self.client, "me", None))
