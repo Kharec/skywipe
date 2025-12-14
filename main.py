@@ -3,22 +3,14 @@
 import sys
 import argparse
 
-from skywipe.commands import run_configure
+from skywipe.commands import get_registry
 from skywipe.configure import Configuration
 
 
-COMMANDS = {
-    "all": "target everything",
-    "configure": "create configuration",
-    "posts": "only posts",
-    "medias": "only posts with medias",
-    "likes": "only likes",
-    "reposts": "only reposts",
-    "follows": "only follows",
-}
-
-
 def _create_parser():
+    registry = get_registry()
+    commands = registry.get_all_commands()
+
     parser = argparse.ArgumentParser(
         description="Clean your bluesky account with style.",
         epilog="WARNING: This tool performs destructive operations. Only use it if you intend to erase data from your Bluesky account."
@@ -31,14 +23,10 @@ def _create_parser():
         required=True
     )
 
-    for cmd, help_text in COMMANDS.items():
+    for cmd, help_text in commands.items():
         subparsers.add_parser(cmd, help=help_text)
 
     return parser
-
-
-def _check_config_required(command: str) -> bool:
-    return command != "configure"
 
 
 def _require_config():
@@ -53,13 +41,16 @@ def main():
     parser = _create_parser()
     args = parser.parse_args()
 
-    if _check_config_required(args.command):
+    registry = get_registry()
+
+    if registry.requires_config(args.command):
         _require_config()
 
-    if args.command == "configure":
-        run_configure()
-    else:
-        print(f"Command '{args.command}' is not yet implemented.")
+    try:
+        registry.execute(args.command)
+    except ValueError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
 
 
 if __name__ == '__main__':
