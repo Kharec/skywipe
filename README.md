@@ -50,7 +50,7 @@ If you run the tool for the first time, it will prompt you to use `skywipe confi
 
 ```yaml
 handle: your_handle
-password: your_password_encrypted
+password: your_password
 batch_size: 10
 delay: 1
 verbose: true
