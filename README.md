@@ -60,9 +60,9 @@ BE SURE TO USE A [BLUESKY APP PASSWORD](https://blueskyfeeds.com/faq-app-passwor
 
 ## Roadmap
 
-- [ ] build cli parameter management
-- [ ] handle configuration logic
-- [ ] sign in to at protocol
+- [x] build cli parameter management
+- [x] handle configuration logic
+- [x] sign in to at protocol
 - [ ] delete posts in groups
 - [ ] only delete posts with media
 - [ ] remove likes
