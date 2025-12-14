@@ -8,16 +8,14 @@ This tool performs destructive operations. Only use it if you intend to erase da
 
 ## Requirements
 
-- Python 3.13+
-- [`atproto`](https://atproto.blue/en/latest/)
-- [`uv`](https://github.com/astral-sh/uv) for dependency and virtual environment management
+We're using [`uv`](https://github.com/astral-sh/uv) for dependency and virtual environment management.
 
-## Setup
+You can setup the project (aka create a virtual environment and install dependencies) with :
 
 ```bash
 git clone https://git.kharec.info/Kharec/skywipe.git
 cd skywipe
-uv sync  # creates a local virtualenv and installs dependencies
+uv sync
 ```
 
 ## How to run
