@@ -8,3 +8,6 @@ dependencies = [
     "atproto>=0.0.65",
     "pyyaml>=6.0",
 ]
+
+[project.scripts]
+skywipe = "main:main"
