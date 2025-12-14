@@ -52,3 +52,10 @@ class Configuration:
             yaml.dump(config_data, f, default_flow_style=False)
 
         print(f"\nConfiguration saved to {self.config_file}")
+
+    def load(self) -> dict:
+        if not self.exists():
+            raise FileNotFoundError(
+                f"Configuration file not found: {self.config_file}")
+        with open(self.config_file, "r") as f:
+            return yaml.safe_load(f)
