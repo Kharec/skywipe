@@ -29,6 +29,7 @@ skywipe posts          # delete posts
 skywipe medias         # delete posts with medias
 skywipe likes          # undo likes
 skywipe reposts        # undo reposts
+skywipe quotes         # delete quotes
 skywipe follows        # unfollow all
 skywipe bookmarks      # delete bookmarks
 ```
@@ -42,6 +43,7 @@ uv run main.py posts          # delete posts
 uv run main.py medias         # delete posts with medias
 uv run main.py likes          # undo likes
 uv run main.py reposts        # undo reposts
+uv run main.py quotes         # delete quotes
 uv run main.py follows        # unfollow all
 uv run main.py bookmarks      # delete bookmarks
 ```
@@ -69,6 +71,7 @@ BE SURE TO USE A [BLUESKY APP PASSWORD](https://blueskyfeeds.com/faq-app-passwor
 - [x] only delete posts with media
 - [x] undo likes
 - [ ] undo reposts
+- [ ] delete quotes
 - [ ] unfollow accounts
 - [ ] remove bookmarks
 - [ ] make `all` run the other commands
