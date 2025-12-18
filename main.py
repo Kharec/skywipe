@@ -3,12 +3,11 @@
 import sys
 import argparse
 
-from skywipe.commands import get_registry
+from skywipe.commands import registry
 from skywipe.configure import Configuration
 
 
-def _create_parser():
-    registry = get_registry()
+def create_parser():
     commands = registry.get_all_commands()
 
     parser = argparse.ArgumentParser(
@@ -29,7 +28,7 @@ def _create_parser():
     return parser
 
 
-def _require_config():
+def require_config():
     config = Configuration()
     if not config.exists():
         print("Error: Configuration file not found.")
@@ -38,13 +37,11 @@ def _require_config():
 
 
 def main():
-    parser = _create_parser()
+    parser = create_parser()
     args = parser.parse_args()
 
-    registry = get_registry()
-
     if registry.requires_config(args.command):
-        _require_config()
+        require_config()
 
     try:
         registry.execute(args.command)
