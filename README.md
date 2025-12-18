@@ -67,8 +67,8 @@ BE SURE TO USE A [BLUESKY APP PASSWORD](https://blueskyfeeds.com/faq-app-passwor
 - [x] sign in to at protocol
 - [x] delete posts in batch
 - [x] only delete posts with media
-- [ ] remove likes
-- [ ] remove reposts
+- [x] undo likes
+- [ ] undo reposts
 - [ ] unfollow accounts
 - [ ] remove bookmarks
 - [ ] make `all` run the other commands
