@@ -1,4 +1,4 @@
-"""Post deletion module for Skywipe CLI."""
+"""Post deletion module for Skywipe"""
 
 import time
 from skywipe.auth import Auth

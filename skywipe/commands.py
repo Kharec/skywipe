@@ -1,4 +1,4 @@
-"""Command implementations for Skywipe CLI."""
+"""Command implementations for Skywipe"""
 
 from typing import Callable, Dict, Optional
 from skywipe.configure import Configuration

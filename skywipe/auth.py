@@ -1,4 +1,4 @@
-"""Authentication module for Skywipe CLI."""
+"""Authentication module for Skywipe"""
 
 from atproto import Client
 from skywipe.configure import Configuration

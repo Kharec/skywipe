@@ -1,4 +1,4 @@
-"""Core configuration handling class and related logic."""
+"""Core configuration module for Skywipe"""
 
 import getpass
 from pathlib import Path
