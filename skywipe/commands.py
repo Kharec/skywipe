@@ -3,6 +3,7 @@
 from typing import Callable, Dict, Optional
 from skywipe.configure import Configuration
 from skywipe.posts import delete_posts
+from skywipe.medias import delete_posts_with_medias
 
 
 CommandHandler = Callable[[], None]
@@ -58,7 +59,7 @@ def run_posts():
 
 
 def run_medias():
-    print("Command 'medias' is not yet implemented.")
+    delete_posts_with_medias()
 
 
 def run_likes():
