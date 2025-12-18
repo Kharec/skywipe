@@ -25,11 +25,12 @@ When installation will be worked out, you'll be able to :
 ```bash
 skywipe all            # target everything
 skywipe configure      # create configuration
-skywipe posts          # only posts
-skywipe medias         # only posts with medias
-skywipe likes          # only likes
-skywipe reposts        # only reposts
-skywipe follows        # only follows
+skywipe posts          # delete posts
+skywipe medias         # delete posts with medias
+skywipe likes          # delete likes
+skywipe reposts        # delete reposts
+skywipe follows        # delete follows
+skywipe bookmarks      # delete follows
 ```
 
 While it's being developed, you can use the tool using `uv` :
@@ -37,11 +38,12 @@ While it's being developed, you can use the tool using `uv` :
 ```bash
 uv run main.py all            # target everything
 uv run main.py configure      # create configuration
-uv run main.py posts          # only posts
-uv run main.py medias         # only posts with medias
-uv run main.py likes          # only likes
-uv run main.py reposts        # only reposts
-uv run main.py follows        # only follows
+uv run main.py posts          # delete posts
+uv run main.py medias         # delete posts with medias
+uv run main.py likes          # delete likes
+uv run main.py reposts        # delete reposts
+uv run main.py follows        # delete follows
+uv run main.py bookmarks      # delete bookmarks
 ```
 
 ### Configuration
@@ -68,6 +70,7 @@ BE SURE TO USE A [BLUESKY APP PASSWORD](https://blueskyfeeds.com/faq-app-passwor
 - [ ] remove likes
 - [ ] remove reposts
 - [ ] unfollow accounts
+- [ ] remove bookmarks
 - [ ] make `all` run the other commands
 - [ ] add simple progress and logging
 - [ ] add safeguards like confirmations and clear dry-run info
