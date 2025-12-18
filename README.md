@@ -63,7 +63,7 @@ BE SURE TO USE A [BLUESKY APP PASSWORD](https://blueskyfeeds.com/faq-app-passwor
 - [x] build cli parameter management
 - [x] handle configuration logic
 - [x] sign in to at protocol
-- [ ] delete posts in groups
+- [x] delete posts in batch
 - [ ] only delete posts with media
 - [ ] remove likes
 - [ ] remove reposts
