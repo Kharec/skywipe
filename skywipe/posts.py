@@ -53,4 +53,4 @@ def delete_posts():
         if delay > 0:
             time.sleep(delay)
 
-        print(f"Deleted {total_deleted} posts.")
+    print(f"Deleted {total_deleted} posts.")
