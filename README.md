@@ -37,15 +37,15 @@ skywipe bookmarks      # delete bookmarks
 While it's being developed, you can use the tool using `uv` :
 
 ```bash
-uv run main.py all            # target everything
-uv run main.py configure      # create configuration
-uv run main.py posts          # delete posts
-uv run main.py medias         # delete posts with medias
-uv run main.py likes          # undo likes
-uv run main.py reposts        # undo reposts
-uv run main.py quotes         # delete quotes
-uv run main.py follows        # unfollow all
-uv run main.py bookmarks      # delete bookmarks
+uv run skywipe/cli.py all            # target everything
+uv run skywipe/cli.py configure      # create configuration
+uv run skywipe/cli.py posts          # delete posts
+uv run skywipe/cli.py medias         # delete posts with medias
+uv run skywipe/cli.py likes          # undo likes
+uv run skywipe/cli.py reposts        # undo reposts
+uv run skywipe/cli.py quotes         # delete quotes
+uv run skywipe/cli.py follows        # unfollow all
+uv run skywipe/cli.py bookmarks      # delete bookmarks
 ```
 
 ### Configuration
