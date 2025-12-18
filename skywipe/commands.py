@@ -2,6 +2,7 @@
 
 from typing import Callable, Dict, Optional
 from skywipe.configure import Configuration
+from skywipe.posts import delete_posts
 
 
 CommandHandler = Callable[[], None]
@@ -9,9 +10,9 @@ CommandHandler = Callable[[], None]
 
 class CommandRegistry:
     def __init__(self):
-        self._commands: Dict[str, CommandHandler] = {}
-        self._help_texts: Dict[str, str] = {}
-        self._requires_config: Dict[str, bool] = {}
+        self._commands = {}
+        self._help_texts = {}
+        self._requires_config = {}
 
     def register(
         self,
@@ -44,11 +45,7 @@ class CommandRegistry:
             raise ValueError(f"Unknown command: {name}")
 
 
-_registry = CommandRegistry()
-
-
-def get_registry() -> CommandRegistry:
-    return _registry
+registry = CommandRegistry()
 
 
 def run_configure():
@@ -57,7 +54,7 @@ def run_configure():
 
 
 def run_posts():
-    print("Command 'posts' is not yet implemented.")
+    delete_posts()
 
 
 def run_medias():
@@ -77,7 +74,6 @@ def run_follows():
 
 
 def run_all():
-    registry = get_registry()
     registry.execute("posts")
     registry.execute("medias")
     registry.execute("likes")
@@ -85,11 +81,11 @@ def run_all():
     registry.execute("follows")
 
 
-_registry.register("configure", run_configure,
-                   "create configuration", requires_config=False)
-_registry.register("posts", run_posts, "only posts")
-_registry.register("medias", run_medias, "only posts with medias")
-_registry.register("likes", run_likes, "only likes")
-_registry.register("reposts", run_reposts, "only reposts")
-_registry.register("follows", run_follows, "only follows")
-_registry.register("all", run_all, "target everything")
+registry.register("configure", run_configure,
+                  "create configuration", requires_config=False)
+registry.register("posts", run_posts, "only posts")
+registry.register("medias", run_medias, "only posts with medias")
+registry.register("likes", run_likes, "only likes")
+registry.register("reposts", run_reposts, "only reposts")
+registry.register("follows", run_follows, "only follows")
+registry.register("all", run_all, "target everything")
