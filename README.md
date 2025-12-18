@@ -8,9 +8,9 @@ This tool performs destructive operations. Only use it if you intend to erase da
 
 ## Requirements
 
-We're using [`uv`](https://github.com/astral-sh/uv) for dependency and virtual environment management.
+Check `pyproject.toml`.
 
-You can setup the project (aka create a virtual environment and install dependencies) with :
+You can use `uv` to install dependencies:
 
 ```bash
 git clone https://git.kharec.info/Kharec/skywipe.git
@@ -64,13 +64,17 @@ BE SURE TO USE A [BLUESKY APP PASSWORD](https://blueskyfeeds.com/faq-app-passwor
 - [x] handle configuration logic
 - [x] sign in to at protocol
 - [x] delete posts in batch
-- [ ] only delete posts with media
+- [x] only delete posts with media
 - [ ] remove likes
 - [ ] remove reposts
 - [ ] unfollow accounts
 - [ ] make `all` run the other commands
 - [ ] add simple progress and logging
 - [ ] add safeguards like confirmations and clear dry-run info
+
+Once it's done, we'll think:
+
+- [ ] decent code architecture
 - [ ] installation and run process
 
 ## License
