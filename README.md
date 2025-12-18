@@ -8,7 +8,7 @@ This tool performs destructive operations. Only use it if you intend to erase da
 
 ## Requirements
 
-Check `pyproject.toml`.
+Check [pyproject.toml](pyproject.toml).
 
 You can use `uv` to install dependencies:
 
