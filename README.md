@@ -27,10 +27,10 @@ skywipe all            # target everything
 skywipe configure      # create configuration
 skywipe posts          # delete posts
 skywipe medias         # delete posts with medias
-skywipe likes          # delete likes
-skywipe reposts        # delete reposts
-skywipe follows        # delete follows
-skywipe bookmarks      # delete follows
+skywipe likes          # undo likes
+skywipe reposts        # undo reposts
+skywipe follows        # unfollow all
+skywipe bookmarks      # delete bookmarks
 ```
 
 While it's being developed, you can use the tool using `uv` :
@@ -40,9 +40,9 @@ uv run main.py all            # target everything
 uv run main.py configure      # create configuration
 uv run main.py posts          # delete posts
 uv run main.py medias         # delete posts with medias
-uv run main.py likes          # delete likes
-uv run main.py reposts        # delete reposts
-uv run main.py follows        # delete follows
+uv run main.py likes          # undo likes
+uv run main.py reposts        # undo reposts
+uv run main.py follows        # unfollow all
 uv run main.py bookmarks      # delete bookmarks
 ```
 
