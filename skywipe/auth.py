@@ -1,7 +1,7 @@
 """Authentication module for Skywipe"""
 
 from atproto import Client
-from skywipe.configure import Configuration
+from .configure import Configuration
 
 
 class Auth:

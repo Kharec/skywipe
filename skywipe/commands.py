@@ -1,10 +1,10 @@
 """Command implementations for Skywipe"""
 
 from typing import Callable, Dict, Optional
-from skywipe.configure import Configuration
-from skywipe.posts import delete_posts
-from skywipe.medias import delete_posts_with_medias
-from skywipe.likes import undo_likes
+from .configure import Configuration
+from .posts import delete_posts
+from .medias import delete_posts_with_medias
+from .likes import undo_likes
 
 
 CommandHandler = Callable[[], None]

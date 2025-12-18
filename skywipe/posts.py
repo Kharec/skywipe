@@ -1,8 +1,8 @@
 """Post deletion module for Skywipe"""
 
 import time
-from skywipe.auth import Auth
-from skywipe.configure import Configuration
+from .auth import Auth
+from .configure import Configuration
 
 
 def delete_posts():

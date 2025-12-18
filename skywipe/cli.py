@@ -3,8 +3,8 @@
 import sys
 import argparse
 
-from skywipe.commands import registry
-from skywipe.configure import Configuration
+from .commands import registry
+from .configure import Configuration
 
 
 def create_parser():

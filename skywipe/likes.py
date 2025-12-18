@@ -2,8 +2,8 @@
 
 import time
 from atproto import models
-from skywipe.auth import Auth
-from skywipe.configure import Configuration
+from .auth import Auth
+from .configure import Configuration
 
 
 LIKE_COLLECTION = "app.bsky.feed.like"
