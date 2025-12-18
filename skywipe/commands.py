@@ -71,6 +71,10 @@ def run_reposts():
     print("Command 'reposts' is not yet implemented.")
 
 
+def run_quotes():
+    print("Command 'quotes' is not yet implemented.")
+
+
 def run_follows():
     print("Command 'follows' is not yet implemented.")
 
@@ -84,6 +88,7 @@ def run_all():
     registry.execute("medias")
     registry.execute("likes")
     registry.execute("reposts")
+    registry.execute("quotes")
     registry.execute("follows")
     registry.execute("bookmarks")
 
@@ -94,6 +99,7 @@ registry.register("posts", run_posts, "only posts")
 registry.register("medias", run_medias, "only posts with medias")
 registry.register("likes", run_likes, "only likes")
 registry.register("reposts", run_reposts, "only reposts")
+registry.register("quotes", run_reposts, "only quotes")
 registry.register("follows", run_follows, "only follows")
 registry.register("bookmarks", run_follows, "only bookmarks")
 registry.register("all", run_all, "target everything")
