@@ -34,6 +34,8 @@ skywipe follows        # unfollow all
 skywipe bookmarks      # delete bookmarks
 ```
 
+### Running with `uv` (without installation)
+
 While it's being developed, you can use the tool using `uv` :
 
 ```bash
@@ -48,7 +50,7 @@ uv run python -m skywipe.cli follows        # unfollow all
 uv run python -m skywipe.cli bookmarks      # delete bookmarks
 ```
 
-### Configuration
+## Configuration
 
 If you run the tool for the first time, it will prompt you to use `skywipe configure` to create the configuration file, which is located in `~/.config/skywipe/config.yml` :
 
