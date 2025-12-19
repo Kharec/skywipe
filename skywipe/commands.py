@@ -2,11 +2,13 @@
 
 from typing import Callable, Dict, Optional
 from .configure import Configuration
-from .posts import delete_posts
+from .posts import delete_all_posts
 from .medias import delete_posts_with_medias
 from .likes import undo_likes
 from .reposts import undo_reposts
-from .quotes import delete_quotes
+from .quotes import delete_quotes_posts
+from .follows import unfollow_all
+from .bookmarks import delete_bookmarks
 
 
 CommandHandler = Callable[[], None]
@@ -58,7 +60,7 @@ def run_configure():
 
 
 def run_posts():
-    delete_posts()
+    delete_all_posts()
 
 
 def run_medias():
@@ -74,25 +76,26 @@ def run_reposts():
 
 
 def run_quotes():
-    delete_quotes()
+    delete_quotes_posts()
 
 
 def run_follows():
-    print("Command 'follows' is not yet implemented.")
+    unfollow_all()
 
 
 def run_bookmarks():
-    print("Command 'bookmarks' is not yet implemented")
+    delete_bookmarks()
 
 
 def run_all():
-    registry.execute("posts")
-    registry.execute("medias")
-    registry.execute("likes")
-    registry.execute("reposts")
-    registry.execute("quotes")
-    registry.execute("follows")
-    registry.execute("bookmarks")
+    commands = ["posts", "likes", "reposts", "follows", "bookmarks"]
+
+    for cmd in commands:
+        try:
+            registry.execute(cmd)
+        except Exception as e:
+            print(f"Error running '{cmd}': {e}")
+            continue
 
 
 registry.register("configure", run_configure,
@@ -103,5 +106,5 @@ registry.register("likes", run_likes, "only likes")
 registry.register("reposts", run_reposts, "only reposts")
 registry.register("quotes", run_quotes, "only quotes")
 registry.register("follows", run_follows, "only follows")
-registry.register("bookmarks", run_follows, "only bookmarks")
+registry.register("bookmarks", run_bookmarks, "only bookmarks")
 registry.register("all", run_all, "target everything")
