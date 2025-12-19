@@ -5,41 +5,6 @@ from .auth import Auth
 from .configure import Configuration
 
 
-def has_media_embed(post_record):
-    embed = getattr(post_record, 'embed', None)
-    if not embed:
-        return False
-
-    embed_type = getattr(embed, 'py_type', None)
-    media_types = {
-        'app.bsky.embed.images',
-        'app.bsky.embed.video',
-        'app.bsky.embed.external'
-    }
-
-    if embed_type:
-        embed_type_base = embed_type.split('#')[0]
-
-        if embed_type_base in media_types:
-            return True
-
-        if embed_type_base in ('app.bsky.embed.recordWithMedia', 'app.bsky.embed.record_with_media'):
-            media = getattr(embed, 'media', None)
-            if media:
-                media_type = getattr(media, 'py_type', None)
-                if media_type:
-                    media_type_base = media_type.split('#')[0]
-                    if media_type_base in media_types:
-                        return True
-
-    for attr in ('images', 'video', 'external'):
-        if hasattr(embed, attr):
-            return True
-        if isinstance(embed, dict) and embed.get(attr):
-            return True
-    return False
-
-
 def delete_posts_with_medias():
     auth = Auth()
     client = auth.login()
@@ -59,11 +24,8 @@ def delete_posts_with_medias():
     total_deleted = 0
 
     while True:
-        if cursor:
-            response = client.get_author_feed(
-                actor=did, limit=batch_size, cursor=cursor)
-        else:
-            response = client.get_author_feed(actor=did, limit=batch_size)
+        response = client.get_author_feed(
+            actor=did, limit=batch_size, cursor=cursor)
 
         posts = response.feed
         if not posts:
@@ -72,7 +34,41 @@ def delete_posts_with_medias():
         for post in posts:
             post_record = post.post
 
-            if not has_media_embed(post_record):
+            embed = getattr(post_record, 'embed', None)
+            has_media = False
+            if embed:
+                embed_type = getattr(embed, 'py_type', None)
+                media_types = {
+                    'app.bsky.embed.images',
+                    'app.bsky.embed.video',
+                    'app.bsky.embed.external'
+                }
+
+                if embed_type:
+                    embed_type_base = embed_type.split('#')[0]
+
+                    if embed_type_base in media_types:
+                        has_media = True
+
+                    if not has_media and embed_type_base in ('app.bsky.embed.recordWithMedia', 'app.bsky.embed.record_with_media'):
+                        media = getattr(embed, 'media', None)
+                        if media:
+                            media_type = getattr(media, 'py_type', None)
+                            if media_type:
+                                media_type_base = media_type.split('#')[0]
+                                if media_type_base in media_types:
+                                    has_media = True
+
+                if not has_media:
+                    for attr in ('images', 'video', 'external'):
+                        if hasattr(embed, attr):
+                            has_media = True
+                            break
+                        if isinstance(embed, dict) and embed.get(attr):
+                            has_media = True
+                            break
+
+            if not has_media:
                 if verbose:
                     print(f"Skipping post without media: {post_record.uri}")
                 continue
