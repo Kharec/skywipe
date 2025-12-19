@@ -5,29 +5,7 @@ from .auth import Auth
 from .configure import Configuration
 
 
-def has_quote_embed(post_record):
-    embed = getattr(post_record, 'embed', None)
-    if not embed:
-        return False
-
-    embed_type = getattr(embed, 'py_type', None)
-    if embed_type:
-        embed_type_base = embed_type.split('#')[0]
-        quote_types = {
-            'app.bsky.embed.record',
-            'app.bsky.embed.recordWithMedia',
-            'app.bsky.embed.record_with_media'
-        }
-        if embed_type_base in quote_types:
-            return True
-
-    if hasattr(embed, 'record') or (isinstance(embed, dict) and embed.get('record')):
-        return True
-
-    return False
-
-
-def delete_quotes():
+def delete_quotes_posts():
     auth = Auth()
     client = auth.login()
     config = Configuration()
@@ -56,7 +34,24 @@ def delete_quotes():
         for post in posts:
             post_record = post.post
 
-            if not has_quote_embed(post_record):
+            embed = getattr(post_record, 'embed', None)
+            has_quote = False
+            if embed:
+                embed_type = getattr(embed, 'py_type', None)
+                if embed_type:
+                    embed_type_base = embed_type.split('#')[0]
+                    quote_types = {
+                        'app.bsky.embed.record',
+                        'app.bsky.embed.recordWithMedia',
+                        'app.bsky.embed.record_with_media'
+                    }
+                    if embed_type_base in quote_types:
+                        has_quote = True
+                
+                if not has_quote and (hasattr(embed, 'record') or (isinstance(embed, dict) and embed.get('record'))):
+                    has_quote = True
+
+            if not has_quote:
                 if verbose:
                     print(f"Skipping post without quote: {post_record.uri}")
                 continue
