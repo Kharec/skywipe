@@ -62,10 +62,7 @@ BE SURE TO USE A [BLUESKY APP PASSWORD](https://blueskyfeeds.com/faq-app-passwor
 - [x] remove bookmarks
 - [x] make `all` run the other commands
 - [ ] add simple progress and logging
-- [ ] add safeguards like confirmations and clear dry-run info
-
-Once it's done, we'll think:
-
+- [ ] add safeguards (confirmation, dry-run flag)
 - [ ] decent code architecture
 - [ ] installation and run process
 
