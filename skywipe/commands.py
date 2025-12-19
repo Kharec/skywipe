@@ -6,6 +6,7 @@ from .posts import delete_posts
 from .medias import delete_posts_with_medias
 from .likes import undo_likes
 from .reposts import undo_reposts
+from .quotes import delete_quotes
 
 
 CommandHandler = Callable[[], None]
@@ -73,7 +74,7 @@ def run_reposts():
 
 
 def run_quotes():
-    print("Command 'quotes' is not yet implemented.")
+    delete_quotes()
 
 
 def run_follows():
@@ -100,7 +101,7 @@ registry.register("posts", run_posts, "only posts")
 registry.register("medias", run_medias, "only posts with medias")
 registry.register("likes", run_likes, "only likes")
 registry.register("reposts", run_reposts, "only reposts")
-registry.register("quotes", run_reposts, "only quotes")
+registry.register("quotes", run_quotes, "only quotes")
 registry.register("follows", run_follows, "only follows")
 registry.register("bookmarks", run_follows, "only bookmarks")
 registry.register("all", run_all, "target everything")
