@@ -58,9 +58,9 @@ BE SURE TO USE A [BLUESKY APP PASSWORD](https://blueskyfeeds.com/faq-app-passwor
 - [x] undo likes
 - [x] undo reposts
 - [x] delete quotes
-- [ ] unfollow accounts
-- [ ] remove bookmarks
-- [ ] make `all` run the other commands
+- [x] unfollow accounts
+- [x] remove bookmarks
+- [x] make `all` run the other commands
 - [ ] add simple progress and logging
 - [ ] add safeguards like confirmations and clear dry-run info
 
