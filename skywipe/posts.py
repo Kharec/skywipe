@@ -5,7 +5,7 @@ from .auth import Auth
 from .configure import Configuration
 
 
-def delete_posts():
+def delete_all_posts():
     auth = Auth()
     client = auth.login()
     config = Configuration()
