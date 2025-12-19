@@ -20,22 +20,6 @@ uv sync
 
 ## How to run
 
-When installation will be worked out, you'll be able to :
-
-```bash
-skywipe all            # target everything
-skywipe configure      # create configuration
-skywipe posts          # delete posts
-skywipe medias         # delete posts with medias
-skywipe likes          # undo likes
-skywipe reposts        # undo reposts
-skywipe quotes         # delete quotes
-skywipe follows        # unfollow all
-skywipe bookmarks      # delete bookmarks
-```
-
-### Running with `uv` (without installation)
-
 While it's being developed, you can use the tool using `uv` :
 
 ```bash
@@ -72,7 +56,7 @@ BE SURE TO USE A [BLUESKY APP PASSWORD](https://blueskyfeeds.com/faq-app-passwor
 - [x] delete posts in batch
 - [x] only delete posts with media
 - [x] undo likes
-- [ ] undo reposts
+- [x] undo reposts
 - [ ] delete quotes
 - [ ] unfollow accounts
 - [ ] remove bookmarks
