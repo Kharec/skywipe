@@ -5,6 +5,7 @@ from .configure import Configuration
 from .posts import delete_posts
 from .medias import delete_posts_with_medias
 from .likes import undo_likes
+from .reposts import undo_reposts
 
 
 CommandHandler = Callable[[], None]
@@ -68,7 +69,7 @@ def run_likes():
 
 
 def run_reposts():
-    print("Command 'reposts' is not yet implemented.")
+    undo_reposts()
 
 
 def run_quotes():
