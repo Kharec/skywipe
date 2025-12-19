@@ -57,7 +57,7 @@ BE SURE TO USE A [BLUESKY APP PASSWORD](https://blueskyfeeds.com/faq-app-passwor
 - [x] only delete posts with media
 - [x] undo likes
 - [x] undo reposts
-- [ ] delete quotes
+- [x] delete quotes
 - [ ] unfollow accounts
 - [ ] remove bookmarks
 - [ ] make `all` run the other commands
