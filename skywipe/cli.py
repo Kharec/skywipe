@@ -9,6 +9,9 @@ from .configure import Configuration
 from .logger import setup_logger, get_logger
 
 
+LOG_FILE = Path.home() / ".cache" / "skywipe" / "skywipe.log"
+
+
 def create_parser():
     commands = registry.get_all_commands()
 
@@ -39,7 +42,7 @@ def create_parser():
 def require_config():
     config = Configuration()
     if not config.exists():
-        logger = setup_logger(verbose=False)
+        logger = get_logger()
         logger.error("Configuration file not found.")
         logger.error("You must run 'skywipe configure' first.")
         sys.exit(1)
@@ -49,15 +52,14 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
 
+    setup_logger(verbose=False, log_file=LOG_FILE)
+
     if registry.requires_config(args.command):
         require_config()
         config = Configuration()
         config_data = config.load()
         verbose = config_data.get("verbose", False)
-        log_file = Path.home() / ".cache" / "skywipe" / "skywipe.log"
-        setup_logger(verbose=verbose, log_file=log_file)
-    else:
-        setup_logger(verbose=False)
+        setup_logger(verbose=verbose, log_file=LOG_FILE)
 
     try:
         registry.execute(
