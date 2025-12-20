@@ -12,41 +12,43 @@ from .logger import get_logger, ProgressTracker
 class OperationContext:
     def __init__(self, client=None, config_data=None):
         self.logger = get_logger()
-
-        if client is not None:
-            self.client = client
-            self.did = client.me.did
-        else:
-            try:
-                self.auth = Auth()
-                self.client = self.auth.login()
-                self.did = self.client.me.did
-            except (ValueError, FileNotFoundError) as e:
-                self.logger.error(f"Configuration error: {e}")
-                raise
-            except Exception as e:
-                self.logger.error(
-                    f"Unexpected error during initialization: {e}", exc_info=True)
-                raise ValueError(
-                    f"Failed to initialize operation context: {e}") from e
-
-        if config_data is not None:
-            self.config_data = config_data
-        else:
-            try:
-                self.config = Configuration()
-                self.config_data = self.config.load()
-            except (ValueError, FileNotFoundError) as e:
-                self.logger.error(f"Configuration error: {e}")
-                raise
-            except Exception as e:
-                self.logger.error(
-                    f"Unexpected error loading configuration: {e}", exc_info=True)
-                raise ValueError(
-                    f"Failed to load configuration: {e}") from e
-
+        self.client, self.did = self._initialize_client(client)
+        self.config_data = self._initialize_config(config_data)
         self.batch_size = self.config_data.get("batch_size", 10)
         self.delay = self.config_data.get("delay", 1)
+
+    def _initialize_client(self, client):
+        if client is not None:
+            return client, client.me.did
+
+        try:
+            auth = Auth()
+            client = auth.login()
+            return client, client.me.did
+        except (ValueError, FileNotFoundError) as e:
+            self.logger.error(f"Configuration error: {e}")
+            raise
+        except Exception as e:
+            self.logger.error(
+                f"Unexpected error during initialization: {e}", exc_info=True)
+            raise ValueError(
+                f"Failed to initialize operation context: {e}") from e
+
+    def _initialize_config(self, config_data):
+        if config_data is not None:
+            return config_data
+
+        try:
+            config = Configuration()
+            return config.load()
+        except (ValueError, FileNotFoundError) as e:
+            self.logger.error(f"Configuration error: {e}")
+            raise
+        except Exception as e:
+            self.logger.error(
+                f"Unexpected error loading configuration: {e}", exc_info=True)
+            raise ValueError(
+                f"Failed to load configuration: {e}") from e
 
 
 class BaseStrategy:
