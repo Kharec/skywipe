@@ -6,7 +6,7 @@ from pathlib import Path
 
 from .commands import registry
 from .configure import Configuration
-from .logger import setup_logger
+from .logger import setup_logger, get_logger
 
 
 def create_parser():
@@ -63,11 +63,11 @@ def main():
         registry.execute(
             args.command, skip_confirmation=getattr(args, "yes", False))
     except ValueError as e:
-        logger = setup_logger(verbose=False)
+        logger = get_logger()
         logger.error(f"{e}")
         sys.exit(1)
     except Exception as e:
-        logger = setup_logger(verbose=False)
+        logger = get_logger()
         logger.error(f"Unexpected error: {e}", exc_info=True)
         sys.exit(1)
 
