@@ -191,12 +191,29 @@ def _get_operation_config(cmd: str) -> Optional[Dict[str, Any]]:
     return configs.get(cmd)
 
 
+COMMAND_EXECUTION_ORDER = [
+    "quotes",
+    "medias",
+    "posts",
+    "likes",
+    "reposts",
+    "follows",
+    "bookmarks",
+]
+
+
 def run_all(skip_confirmation: bool = False):
     logger = get_logger()
 
     all_commands = registry.get_all_commands()
-    commands = [cmd for cmd in all_commands.keys()
-                if cmd not in ("configure", "all")]
+    available_commands = [cmd for cmd in all_commands.keys()
+                          if cmd not in ("configure", "all")]
+
+    commands = [cmd for cmd in COMMAND_EXECUTION_ORDER
+                if cmd in available_commands]
+
+    commands.extend([cmd for cmd in available_commands
+                     if cmd not in COMMAND_EXECUTION_ORDER])
 
     commands_str = ", ".join(commands)
     all_confirmation = f"run all cleanup commands ({commands_str})"
