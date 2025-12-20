@@ -12,26 +12,6 @@ Python 3.13+.
 
 The rest of the dependencies are listed in [pyproject.toml](pyproject.toml).
 
-## Hacking
-
-You can use `uv` to install dependencies:
-
-```bash
-git clone https://git.kharec.info/Kharec/skywipe.git
-cd skywipe
-uv sync
-```
-
-Then start coding.
-
-If you want to test your changes, you can run the tool with:
-
-```bash
-uv run python -m skywipe.cli -h
-uv run python -m skywipe.cli all
-# or any other command
-```
-
 ## Installation
 
 Use [`pipx`](https://pipx.pypa.io/latest/installation/) to install `skywipe`:
@@ -61,6 +41,26 @@ verbose: true
 ```
 
 BE SURE TO USE A [BLUESKY APP PASSWORD](https://blueskyfeeds.com/faq-app-password) FOR OBVIOUS SECURITY REASONS.
+
+## Hacking
+
+You can use `uv` to install dependencies:
+
+```bash
+git clone https://git.kharec.info/Kharec/skywipe.git
+cd skywipe
+uv sync
+```
+
+Then start coding.
+
+If you want to test your changes, you can run the tool with:
+
+```bash
+uv run python -m skywipe.cli -h
+uv run python -m skywipe.cli all
+# or any other command
+```
 
 ## License
 
