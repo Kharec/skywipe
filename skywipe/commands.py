@@ -2,13 +2,8 @@
 
 from typing import Callable, Dict, Optional
 from .configure import Configuration
-from .posts import delete_all_posts
-from .medias import delete_posts_with_medias
-from .likes import undo_likes
-from .reposts import undo_reposts
-from .quotes import delete_quotes_posts
-from .follows import unfollow_all
-from .bookmarks import delete_bookmarks
+from .operations import Operation
+from .post_analysis import PostAnalyzer
 from .logger import get_logger
 from .safeguard import require_confirmation
 
@@ -66,37 +61,42 @@ def run_configure():
 
 def run_posts(skip_confirmation: bool = False):
     require_confirmation("delete all posts", skip_confirmation)
-    delete_all_posts()
+    Operation("Deleting posts").run()
 
 
 def run_medias(skip_confirmation: bool = False):
     require_confirmation("delete all posts with media", skip_confirmation)
-    delete_posts_with_medias()
+    Operation("Deleting posts with media",
+              filter_fn=lambda post: PostAnalyzer.has_media(post.post)).run()
 
 
 def run_likes(skip_confirmation: bool = False):
     require_confirmation("undo all likes", skip_confirmation)
-    undo_likes()
+    Operation("Undoing likes", strategy_type="record",
+              collection="app.bsky.feed.like").run()
 
 
 def run_reposts(skip_confirmation: bool = False):
     require_confirmation("undo all reposts", skip_confirmation)
-    undo_reposts()
+    Operation("Undoing reposts", strategy_type="record",
+              collection="app.bsky.feed.repost").run()
 
 
 def run_quotes(skip_confirmation: bool = False):
     require_confirmation("delete all quote posts", skip_confirmation)
-    delete_quotes_posts()
+    Operation("Deleting quote posts",
+              filter_fn=lambda post: PostAnalyzer.has_quote(post.post)).run()
 
 
 def run_follows(skip_confirmation: bool = False):
     require_confirmation("unfollow all accounts", skip_confirmation)
-    unfollow_all()
+    Operation("Unfollowing accounts", strategy_type="record",
+              collection="app.bsky.graph.follow").run()
 
 
 def run_bookmarks(skip_confirmation: bool = False):
     require_confirmation("delete all bookmarks", skip_confirmation)
-    delete_bookmarks()
+    Operation("Deleting bookmarks", strategy_type="bookmark").run()
 
 
 def run_all(skip_confirmation: bool = False):
