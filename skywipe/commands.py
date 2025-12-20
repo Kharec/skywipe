@@ -132,6 +132,54 @@ run_bookmarks = _create_operation_handler(
 )
 
 
+def _get_operation_config(cmd: str) -> Optional[Dict[str, Any]]:
+    configs = {
+        "posts": {
+            "operation_name": "Deleting posts",
+            "strategy_type": "feed",
+            "collection": None,
+            "filter_fn": None
+        },
+        "medias": {
+            "operation_name": "Deleting posts with media",
+            "strategy_type": "feed",
+            "collection": None,
+            "filter_fn": lambda post: PostAnalyzer.has_media(post.post)
+        },
+        "likes": {
+            "operation_name": "Undoing likes",
+            "strategy_type": "record",
+            "collection": "app.bsky.feed.like",
+            "filter_fn": None
+        },
+        "reposts": {
+            "operation_name": "Undoing reposts",
+            "strategy_type": "record",
+            "collection": "app.bsky.feed.repost",
+            "filter_fn": None
+        },
+        "quotes": {
+            "operation_name": "Deleting quote posts",
+            "strategy_type": "feed",
+            "collection": None,
+            "filter_fn": lambda post: PostAnalyzer.has_quote(post.post)
+        },
+        "follows": {
+            "operation_name": "Unfollowing accounts",
+            "strategy_type": "record",
+            "collection": "app.bsky.graph.follow",
+            "filter_fn": None
+        },
+        "bookmarks": {
+            "operation_name": "Deleting bookmarks",
+            "strategy_type": "bookmark",
+            "collection": None,
+            "filter_fn": None
+        }
+    }
+    return configs.get(cmd)
+
+
 def run_all(skip_confirmation: bool = False):
     logger = get_logger()
 
@@ -144,10 +192,32 @@ def run_all(skip_confirmation: bool = False):
         f"run all cleanup commands ({commands_str})", skip_confirmation)
 
     logger.info("Running all cleanup commands...")
+
+    from .operations import OperationContext
+    try:
+        context = OperationContext()
+        shared_client = context.client
+        shared_config_data = context.config_data
+    except Exception as e:
+        logger.error(
+            f"Failed to initialize shared context: {e}", exc_info=True)
+        raise
+
     for cmd in commands:
         try:
             logger.info(f"Starting command: {cmd}")
-            registry.execute(cmd, skip_confirmation=True)
+            operation_config = _get_operation_config(cmd)
+            if operation_config:
+                Operation(
+                    operation_config["operation_name"],
+                    strategy_type=operation_config["strategy_type"],
+                    collection=operation_config["collection"],
+                    filter_fn=operation_config["filter_fn"],
+                    client=shared_client,
+                    config_data=shared_config_data
+                ).run()
+            else:
+                registry.execute(cmd, skip_confirmation=True)
             logger.info(f"Completed command: {cmd}")
         except Exception as e:
             logger.error(f"Error running '{cmd}': {e}", exc_info=True)
