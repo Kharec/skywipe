@@ -51,8 +51,12 @@ class Configuration:
             "verbose": verbose
         }
 
-        with open(self.config_file, "w") as f:
-            yaml.dump(config_data, f, default_flow_style=False)
+        try:
+            with open(self.config_file, "w") as f:
+                yaml.dump(config_data, f, default_flow_style=False)
+        except (IOError, OSError) as e:
+            logger.error(f"Failed to save configuration: {e}")
+            return
 
         logger.info(f"Configuration saved to {self.config_file}")
 
@@ -60,5 +64,15 @@ class Configuration:
         if not self.exists():
             raise FileNotFoundError(
                 f"Configuration file not found: {self.config_file}")
-        with open(self.config_file, "r") as f:
-            return yaml.safe_load(f)
+        try:
+            with open(self.config_file, "r") as f:
+                config_data = yaml.safe_load(f)
+                if config_data is None:
+                    raise ValueError("Configuration file is empty or invalid")
+                return config_data
+        except (IOError, OSError) as e:
+            raise ValueError(
+                f"Failed to read configuration file: {e}") from e
+        except yaml.YAMLError as e:
+            raise ValueError(
+                f"Invalid YAML in configuration file: {e}") from e

@@ -12,10 +12,20 @@ from .logger import get_logger, ProgressTracker
 class OperationContext:
     def __init__(self):
         self.logger = get_logger()
-        self.auth = Auth()
-        self.client = self.auth.login()
-        self.config = Configuration()
-        self.config_data = self.config.load()
+        try:
+            self.auth = Auth()
+            self.client = self.auth.login()
+            self.config = Configuration()
+            self.config_data = self.config.load()
+        except (ValueError, FileNotFoundError) as e:
+            self.logger.error(f"Configuration error: {e}")
+            raise
+        except Exception as e:
+            self.logger.error(
+                f"Unexpected error during initialization: {e}", exc_info=True)
+            raise ValueError(
+                f"Failed to initialize operation context: {e}") from e
+
         self.batch_size = self.config_data.get("batch_size", 10)
         self.delay = self.config_data.get("delay", 1)
         self.did = self.client.me.did
@@ -138,8 +148,13 @@ class Operation:
 
         while True:
             batch_num += 1
-            response = self.strategy.fetch(context, cursor)
-            items = self.strategy.extract_items(response)
+            try:
+                response = self.strategy.fetch(context, cursor)
+                items = self.strategy.extract_items(response)
+            except Exception as e:
+                context.logger.error(
+                    f"Error fetching items for batch {batch_num}: {e}", exc_info=True)
+                break
 
             if not items:
                 break

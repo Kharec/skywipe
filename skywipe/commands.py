@@ -63,12 +63,22 @@ def _create_operation_handler(
 ) -> CommandHandler:
     def handler(skip_confirmation: bool = False):
         require_confirmation(confirmation_message, skip_confirmation)
-        Operation(
-            operation_name,
-            strategy_type=strategy_type,
-            collection=collection,
-            filter_fn=filter_fn
-        ).run()
+        try:
+            Operation(
+                operation_name,
+                strategy_type=strategy_type,
+                collection=collection,
+                filter_fn=filter_fn
+            ).run()
+        except ValueError as e:
+            logger = get_logger()
+            logger.error(f"{e}")
+            raise
+        except Exception as e:
+            logger = get_logger()
+            logger.error(
+                f"Unexpected error during operation: {e}", exc_info=True)
+            raise
     return handler
 
 

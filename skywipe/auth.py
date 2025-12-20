@@ -10,7 +10,11 @@ class Auth:
         self.client = None
 
     def login(self) -> Client:
-        config_data = self.config.load()
+        try:
+            config_data = self.config.load()
+        except FileNotFoundError as e:
+            raise ValueError(
+                "Configuration file not found. Run 'skywipe configure' first.") from e
 
         handle = config_data.get("handle")
         password = config_data.get("password")
@@ -19,7 +23,11 @@ class Auth:
             raise ValueError(
                 "handle and password must be set in configuration")
 
-        self.client = Client()
-        self.client.login(handle, password)
+        try:
+            self.client = Client()
+            self.client.login(handle, password)
+        except Exception as e:
+            raise ValueError(
+                f"Failed to authenticate: {e}") from e
 
         return self.client
