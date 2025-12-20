@@ -17,6 +17,12 @@ def create_parser():
         epilog="WARNING: This tool performs destructive operations. Only use it if you intend to erase data from your Bluesky account."
     )
 
+    parser.add_argument(
+        "--yes",
+        action="store_true",
+        help="Skip confirmation prompt and proceed with destructive operations"
+    )
+
     subparsers = parser.add_subparsers(
         dest="command",
         help="Command to execute",
@@ -48,13 +54,14 @@ def main():
         config = Configuration()
         config_data = config.load()
         verbose = config_data.get("verbose", False)
-        log_file = Path.home() / ".config" / "skywipe" / "skywipe.log"
+        log_file = Path.home() / ".cache" / "skywipe" / "skywipe.log"
         setup_logger(verbose=verbose, log_file=log_file)
     else:
         setup_logger(verbose=False)
 
     try:
-        registry.execute(args.command)
+        registry.execute(
+            args.command, skip_confirmation=getattr(args, "yes", False))
     except ValueError as e:
         logger = setup_logger(verbose=False)
         logger.error(f"{e}")
