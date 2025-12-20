@@ -4,7 +4,7 @@ from typing import Callable, Dict, Optional, Any
 from .configure import Configuration
 from .operations import Operation
 from .post_analysis import PostAnalyzer
-from .logger import get_logger
+from .logger import get_logger, handle_error
 from .safeguard import require_confirmation
 
 
@@ -131,8 +131,10 @@ def _create_operation_handler(
     collection: Optional[str] = None,
     filter_fn: Optional[Callable[[Any], bool]] = None
 ) -> CommandHandler:
+    logger = get_logger()
+
     def handler(skip_confirmation: bool = False):
-        require_confirmation(confirmation_message, skip_confirmation)
+        require_confirmation(confirmation_message, skip_confirmation, logger)
         try:
             Operation(
                 operation_name,
@@ -140,15 +142,8 @@ def _create_operation_handler(
                 collection=collection,
                 filter_fn=filter_fn
             ).run()
-        except ValueError as e:
-            logger = get_logger()
-            logger.error(f"{e}")
-            raise
-        except Exception as e:
-            logger = get_logger()
-            logger.error(
-                f"Unexpected error during operation: {e}", exc_info=True)
-            raise
+        except (ValueError, Exception) as e:
+            handle_error(e, logger)
     return handler
 
 
@@ -195,7 +190,7 @@ def run_all(skip_confirmation: bool = False):
 
     commands_str = ", ".join(commands)
     all_confirmation = f"run all cleanup commands ({commands_str})"
-    require_confirmation(all_confirmation, skip_confirmation)
+    require_confirmation(all_confirmation, skip_confirmation, logger)
 
     logger.info("Running all cleanup commands...")
 
