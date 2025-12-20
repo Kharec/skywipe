@@ -21,7 +21,12 @@ class OperationContext:
         self.did = self.client.me.did
 
 
-class RecordDeletionStrategy:
+class BaseStrategy:
+    def get_cursor(self, response):
+        return response.cursor
+
+
+class RecordDeletionStrategy(BaseStrategy):
     def __init__(self, collection: str):
         self.collection = collection
 
@@ -37,9 +42,6 @@ class RecordDeletionStrategy:
     def extract_items(self, response):
         return response.records
 
-    def get_cursor(self, response):
-        return response.cursor
-
     def process_item(self, record, context: OperationContext):
         record_uri = record.uri
         rkey = record_uri.rsplit("/", 1)[-1]
@@ -52,7 +54,7 @@ class RecordDeletionStrategy:
         context.logger.debug(f"Deleted: {record_uri}")
 
 
-class FeedStrategy:
+class FeedStrategy(BaseStrategy):
     def fetch(self, context: OperationContext, cursor: Optional[str] = None):
         if cursor:
             return context.client.get_author_feed(
@@ -63,16 +65,13 @@ class FeedStrategy:
     def extract_items(self, response):
         return response.feed
 
-    def get_cursor(self, response):
-        return response.cursor
-
     def process_item(self, post, context: OperationContext):
         uri = post.post.uri
         context.client.delete_post(uri)
         context.logger.debug(f"Deleted post: {uri}")
 
 
-class BookmarkStrategy:
+class BookmarkStrategy(BaseStrategy):
     def fetch(self, context: OperationContext, cursor: Optional[str] = None):
         get_params = models.AppBskyBookmarkGetBookmarks.Params(
             limit=context.batch_size,
@@ -82,9 +81,6 @@ class BookmarkStrategy:
 
     def extract_items(self, response):
         return response.bookmarks
-
-    def get_cursor(self, response):
-        return response.cursor
 
     def process_item(self, bookmark, context: OperationContext):
         bookmark_uri = self._extract_bookmark_uri(bookmark)
