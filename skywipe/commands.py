@@ -1,6 +1,6 @@
 """Command implementations for Skywipe"""
 
-from typing import Callable, Dict, Optional
+from typing import Callable, Dict, Optional, Any
 from .configure import Configuration
 from .operations import Operation
 from .post_analysis import PostAnalyzer
@@ -54,49 +54,72 @@ class CommandRegistry:
 registry = CommandRegistry()
 
 
+def _create_operation_handler(
+    confirmation_message: str,
+    operation_name: str,
+    strategy_type: str = "feed",
+    collection: Optional[str] = None,
+    filter_fn: Optional[Callable[[Any], bool]] = None
+) -> CommandHandler:
+    def handler(skip_confirmation: bool = False):
+        require_confirmation(confirmation_message, skip_confirmation)
+        Operation(
+            operation_name,
+            strategy_type=strategy_type,
+            collection=collection,
+            filter_fn=filter_fn
+        ).run()
+    return handler
+
+
 def run_configure():
     config = Configuration()
     config.create()
 
 
-def run_posts(skip_confirmation: bool = False):
-    require_confirmation("delete all posts", skip_confirmation)
-    Operation("Deleting posts").run()
+run_posts = _create_operation_handler(
+    "delete all posts",
+    "Deleting posts"
+)
 
+run_medias = _create_operation_handler(
+    "delete all posts with media",
+    "Deleting posts with media",
+    filter_fn=lambda post: PostAnalyzer.has_media(post.post)
+)
 
-def run_medias(skip_confirmation: bool = False):
-    require_confirmation("delete all posts with media", skip_confirmation)
-    Operation("Deleting posts with media",
-              filter_fn=lambda post: PostAnalyzer.has_media(post.post)).run()
+run_likes = _create_operation_handler(
+    "undo all likes",
+    "Undoing likes",
+    strategy_type="record",
+    collection="app.bsky.feed.like"
+)
 
+run_reposts = _create_operation_handler(
+    "undo all reposts",
+    "Undoing reposts",
+    strategy_type="record",
+    collection="app.bsky.feed.repost"
+)
 
-def run_likes(skip_confirmation: bool = False):
-    require_confirmation("undo all likes", skip_confirmation)
-    Operation("Undoing likes", strategy_type="record",
-              collection="app.bsky.feed.like").run()
+run_quotes = _create_operation_handler(
+    "delete all quote posts",
+    "Deleting quote posts",
+    filter_fn=lambda post: PostAnalyzer.has_quote(post.post)
+)
 
+run_follows = _create_operation_handler(
+    "unfollow all accounts",
+    "Unfollowing accounts",
+    strategy_type="record",
+    collection="app.bsky.graph.follow"
+)
 
-def run_reposts(skip_confirmation: bool = False):
-    require_confirmation("undo all reposts", skip_confirmation)
-    Operation("Undoing reposts", strategy_type="record",
-              collection="app.bsky.feed.repost").run()
-
-
-def run_quotes(skip_confirmation: bool = False):
-    require_confirmation("delete all quote posts", skip_confirmation)
-    Operation("Deleting quote posts",
-              filter_fn=lambda post: PostAnalyzer.has_quote(post.post)).run()
-
-
-def run_follows(skip_confirmation: bool = False):
-    require_confirmation("unfollow all accounts", skip_confirmation)
-    Operation("Unfollowing accounts", strategy_type="record",
-              collection="app.bsky.graph.follow").run()
-
-
-def run_bookmarks(skip_confirmation: bool = False):
-    require_confirmation("delete all bookmarks", skip_confirmation)
-    Operation("Deleting bookmarks", strategy_type="bookmark").run()
+run_bookmarks = _create_operation_handler(
+    "delete all bookmarks",
+    "Deleting bookmarks",
+    strategy_type="bookmark"
+)
 
 
 def run_all(skip_confirmation: bool = False):
