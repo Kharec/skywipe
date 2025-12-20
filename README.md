@@ -67,7 +67,7 @@ BE SURE TO USE A [BLUESKY APP PASSWORD](https://blueskyfeeds.com/faq-app-passwor
 - [x] make `all` run the other commands
 - [x] add simple progress and logging
 - [x] add safeguards (confirmation, dry-run flag)
-- [ ] decent code architecture
+- [x] decent code architecture
 - [ ] installation and run process
 
 ## License
