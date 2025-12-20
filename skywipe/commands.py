@@ -11,6 +11,17 @@ from .safeguard import require_confirmation
 CommandHandler = Callable[..., None]
 
 
+CONFIRMATION_MESSAGES = {
+    "posts": "delete all posts",
+    "medias": "delete all posts with media",
+    "likes": "undo all likes",
+    "reposts": "undo all reposts",
+    "quotes": "delete all quote posts",
+    "follows": "unfollow all accounts",
+    "bookmarks": "delete all bookmarks",
+}
+
+
 class CommandRegistry:
     def __init__(self):
         self._commands = {}
@@ -88,45 +99,45 @@ def run_configure():
 
 
 run_posts = _create_operation_handler(
-    "delete all posts",
+    CONFIRMATION_MESSAGES["posts"],
     "Deleting posts"
 )
 
 run_medias = _create_operation_handler(
-    "delete all posts with media",
+    CONFIRMATION_MESSAGES["medias"],
     "Deleting posts with media",
     filter_fn=lambda post: PostAnalyzer.has_media(post.post)
 )
 
 run_likes = _create_operation_handler(
-    "undo all likes",
+    CONFIRMATION_MESSAGES["likes"],
     "Undoing likes",
     strategy_type="record",
     collection="app.bsky.feed.like"
 )
 
 run_reposts = _create_operation_handler(
-    "undo all reposts",
+    CONFIRMATION_MESSAGES["reposts"],
     "Undoing reposts",
     strategy_type="record",
     collection="app.bsky.feed.repost"
 )
 
 run_quotes = _create_operation_handler(
-    "delete all quote posts",
+    CONFIRMATION_MESSAGES["quotes"],
     "Deleting quote posts",
     filter_fn=lambda post: PostAnalyzer.has_quote(post.post)
 )
 
 run_follows = _create_operation_handler(
-    "unfollow all accounts",
+    CONFIRMATION_MESSAGES["follows"],
     "Unfollowing accounts",
     strategy_type="record",
     collection="app.bsky.graph.follow"
 )
 
 run_bookmarks = _create_operation_handler(
-    "delete all bookmarks",
+    CONFIRMATION_MESSAGES["bookmarks"],
     "Deleting bookmarks",
     strategy_type="bookmark"
 )
@@ -188,8 +199,8 @@ def run_all(skip_confirmation: bool = False):
                 if cmd not in ("configure", "all")]
 
     commands_str = ", ".join(commands)
-    require_confirmation(
-        f"run all cleanup commands ({commands_str})", skip_confirmation)
+    all_confirmation = f"run all cleanup commands ({commands_str})"
+    require_confirmation(all_confirmation, skip_confirmation)
 
     logger.info("Running all cleanup commands...")
 
