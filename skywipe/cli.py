@@ -4,6 +4,7 @@ import sys
 import argparse
 from pathlib import Path
 
+from . import __version__
 from .commands import registry
 from .configure import Configuration
 from .logger import setup_logger, get_logger, handle_error
@@ -18,6 +19,12 @@ def create_parser():
     parser = argparse.ArgumentParser(
         description="Clean your bluesky account with style.",
         epilog="WARNING: This tool deletes your Bluesky data permanently."
+    )
+
+    parser.add_argument(
+        "-v", "--version",
+        action="version",
+        version=f"Skywipe {__version__}"
     )
 
     parser.add_argument(
