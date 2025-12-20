@@ -101,10 +101,14 @@ def run_bookmarks(skip_confirmation: bool = False):
 
 def run_all(skip_confirmation: bool = False):
     logger = get_logger()
-    require_confirmation(
-        "run all cleanup commands (posts, likes, reposts, follows, bookmarks)", skip_confirmation)
 
-    commands = ["posts", "likes", "reposts", "follows", "bookmarks"]
+    all_commands = registry.get_all_commands()
+    commands = [cmd for cmd in all_commands.keys()
+                if cmd not in ("configure", "all")]
+
+    commands_str = ", ".join(commands)
+    require_confirmation(
+        f"run all cleanup commands ({commands_str})", skip_confirmation)
 
     logger.info("Running all cleanup commands...")
     for cmd in commands:
