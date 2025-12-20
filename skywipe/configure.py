@@ -3,19 +3,25 @@
 import getpass
 import re
 from pathlib import Path
+from typing import NamedTuple
 import yaml
 from .logger import setup_logger
 
 
-def _validate_handle(handle: str) -> tuple[bool, str]:
+class ValidationResult(NamedTuple):
+    is_valid: bool
+    error_message: str
+
+
+def _validate_handle(handle: str) -> ValidationResult:
     if not handle:
-        return False, "Handle cannot be empty"
+        return ValidationResult(False, "Handle cannot be empty")
 
     if len(handle) > 253:
-        return False, "Handle is too long (max 253 characters)"
+        return ValidationResult(False, "Handle is too long (max 253 characters)")
 
     if " " in handle:
-        return False, "Handle cannot contain spaces"
+        return ValidationResult(False, "Handle cannot contain spaces")
 
     handle_pattern = re.compile(
         r"^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$|"
@@ -24,23 +30,23 @@ def _validate_handle(handle: str) -> tuple[bool, str]:
     )
 
     if not handle_pattern.match(handle):
-        return False, (
+        return ValidationResult(False, (
             "Invalid handle format. "
             "Use a username (e.g., 'alice'), full handle (e.g., 'alice.bsky.social'), "
             "or DID (e.g., 'did:plc:...')"
-        )
+        ))
 
-    return True, ""
+    return ValidationResult(True, "")
 
 
-def _validate_password(password: str) -> tuple[bool, str]:
+def _validate_password(password: str) -> ValidationResult:
     if not password:
-        return False, "Password cannot be empty"
+        return ValidationResult(False, "Password cannot be empty")
 
     if len(password) < 8:
-        return False, "Password is too short (minimum 8 characters)"
+        return ValidationResult(False, "Password is too short (minimum 8 characters)")
 
-    return True, ""
+    return ValidationResult(True, "")
 
 
 class Configuration:
