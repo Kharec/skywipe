@@ -2,9 +2,9 @@
 
 Skywipe is a work-in-progress Python 3.13+ CLI that helps you wipe data from your Bluesky account using the AT Protocol SDK.
 
-## Warning
+**Warning:** This tool performs _**destructive operations**_.
 
-This tool performs destructive operations. Only use it if you intend to erase data from your Bluesky account.
+Only use it if you intend to permanently erase data from your Bluesky account.
 
 ## Requirements
 
