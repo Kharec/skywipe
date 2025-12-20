@@ -20,26 +20,33 @@ class PostAnalyzer:
     }
 
     @staticmethod
+    def _get_embed(post_record):
+        return getattr(post_record, 'embed', None)
+
+    @staticmethod
+    def _get_embed_type_base(embed):
+        embed_type = getattr(embed, 'py_type', None)
+        if embed_type:
+            return embed_type.split('#')[0]
+        return None
+
+    @staticmethod
     def has_media(post_record):
-        embed = getattr(post_record, 'embed', None)
+        embed = PostAnalyzer._get_embed(post_record)
         if not embed:
             return False
 
-        embed_type = getattr(embed, 'py_type', None)
-        if embed_type:
-            embed_type_base = embed_type.split('#')[0]
-
+        embed_type_base = PostAnalyzer._get_embed_type_base(embed)
+        if embed_type_base:
             if embed_type_base in PostAnalyzer.MEDIA_TYPES:
                 return True
 
             if embed_type_base in PostAnalyzer.QUOTE_WITH_MEDIA_TYPES:
                 media = getattr(embed, 'media', None)
                 if media:
-                    media_type = getattr(media, 'py_type', None)
-                    if media_type:
-                        media_type_base = media_type.split('#')[0]
-                        if media_type_base in PostAnalyzer.MEDIA_TYPES:
-                            return True
+                    media_type_base = PostAnalyzer._get_embed_type_base(media)
+                    if media_type_base and media_type_base in PostAnalyzer.MEDIA_TYPES:
+                        return True
 
         for attr in ('images', 'video', 'external'):
             if hasattr(embed, attr):
@@ -51,15 +58,13 @@ class PostAnalyzer:
 
     @staticmethod
     def has_quote(post_record):
-        embed = getattr(post_record, 'embed', None)
+        embed = PostAnalyzer._get_embed(post_record)
         if not embed:
             return False
 
-        embed_type = getattr(embed, 'py_type', None)
-        if embed_type:
-            embed_type_base = embed_type.split('#')[0]
-            if embed_type_base in PostAnalyzer.QUOTE_TYPES:
-                return True
+        embed_type_base = PostAnalyzer._get_embed_type_base(embed)
+        if embed_type_base and embed_type_base in PostAnalyzer.QUOTE_TYPES:
+            return True
 
         return (hasattr(embed, 'record') or
                 (isinstance(embed, dict) and embed.get('record')))
