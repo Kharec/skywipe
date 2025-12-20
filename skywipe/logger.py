@@ -89,3 +89,15 @@ def setup_logger(verbose: bool = False, log_file: Optional[Path] = None) -> logg
 
 def get_logger() -> logging.Logger:
     return logging.getLogger("skywipe")
+
+
+def handle_error(error: Exception, logger: logging.Logger, exit_on_error: bool = False) -> None:
+    if isinstance(error, ValueError):
+        logger.error(f"{error}")
+    else:
+        logger.error(f"Unexpected error: {error}", exc_info=True)
+
+    if exit_on_error:
+        sys.exit(1)
+    else:
+        raise error
