@@ -37,34 +37,52 @@ class LevelFilter(logging.Filter):
 
 def setup_logger(verbose: bool = False, log_file: Optional[Path] = None) -> logging.Logger:
     logger = logging.getLogger("skywipe")
-    logger.setLevel(logging.DEBUG if verbose else logging.INFO)
+    target_level = logging.DEBUG if verbose else logging.INFO
+    logger.setLevel(target_level)
 
-    if logger.handlers:
-        return logger
+    info_handler = None
+    error_handler = None
+    file_handlers = []
+
+    for handler in logger.handlers:
+        if isinstance(handler, logging.StreamHandler):
+            if handler.stream == sys.stdout:
+                info_handler = handler
+            elif handler.stream == sys.stderr:
+                error_handler = handler
+        elif isinstance(handler, logging.FileHandler):
+            file_handlers.append(handler)
 
     formatter = logging.Formatter(fmt="%(levelname)s: %(message)s")
 
-    info_handler = logging.StreamHandler(sys.stdout)
-    info_handler.setLevel(logging.DEBUG if verbose else logging.INFO)
-    info_handler.addFilter(LevelFilter(logging.DEBUG, logging.INFO))
-    info_handler.setFormatter(formatter)
-    logger.addHandler(info_handler)
+    if info_handler is None:
+        info_handler = logging.StreamHandler(sys.stdout)
+        info_handler.addFilter(LevelFilter(logging.DEBUG, logging.INFO))
+        info_handler.setFormatter(formatter)
+        logger.addHandler(info_handler)
+    info_handler.setLevel(target_level)
 
-    error_handler = logging.StreamHandler(sys.stderr)
-    error_handler.setLevel(logging.WARNING)
-    error_handler.setFormatter(formatter)
-    logger.addHandler(error_handler)
+    if error_handler is None:
+        error_handler = logging.StreamHandler(sys.stderr)
+        error_handler.setLevel(logging.WARNING)
+        error_handler.setFormatter(formatter)
+        logger.addHandler(error_handler)
 
     if log_file:
-        log_file.parent.mkdir(parents=True, exist_ok=True)
-        file_handler = logging.FileHandler(log_file, encoding="utf-8")
-        file_handler.setLevel(logging.DEBUG)
-        file_formatter = logging.Formatter(
-            fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-            datefmt="%Y-%m-%d %H:%M:%S"
-        )
-        file_handler.setFormatter(file_formatter)
-        logger.addHandler(file_handler)
+        if not file_handlers:
+            log_file.parent.mkdir(parents=True, exist_ok=True)
+            file_handler = logging.FileHandler(log_file, encoding="utf-8")
+            file_handler.setLevel(logging.DEBUG)
+            file_formatter = logging.Formatter(
+                fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                datefmt="%Y-%m-%d %H:%M:%S"
+            )
+            file_handler.setFormatter(file_formatter)
+            logger.addHandler(file_handler)
+    else:
+        for handler in file_handlers:
+            handler.close()
+            logger.removeHandler(handler)
 
     return logger
 
