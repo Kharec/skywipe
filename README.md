@@ -61,7 +61,7 @@ BE SURE TO USE A [BLUESKY APP PASSWORD](https://blueskyfeeds.com/faq-app-passwor
 - [x] unfollow accounts
 - [x] remove bookmarks
 - [x] make `all` run the other commands
-- [ ] add simple progress and logging
+- [x] add simple progress and logging
 - [ ] add safeguards (confirmation, dry-run flag)
 - [ ] decent code architecture
 - [ ] installation and run process
