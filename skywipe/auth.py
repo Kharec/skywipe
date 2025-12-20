@@ -23,6 +23,3 @@ class Auth:
         self.client.login(handle, password)
 
         return self.client
-
-    def is_logged(self) -> bool:
-        return bool(getattr(self.client, "me", None))
