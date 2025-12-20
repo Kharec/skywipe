@@ -34,6 +34,8 @@ uv run python -m skywipe.cli follows        # unfollow all
 uv run python -m skywipe.cli bookmarks      # delete bookmarks
 ```
 
+Use the `--yes` flag to skip the confirmation prompt and proceed with the operation.
+
 ## Configuration
 
 If you run the tool for the first time, it will prompt you to use `skywipe configure` to create the configuration file, which is located in `~/.config/skywipe/config.yml` :
@@ -62,7 +64,7 @@ BE SURE TO USE A [BLUESKY APP PASSWORD](https://blueskyfeeds.com/faq-app-passwor
 - [x] remove bookmarks
 - [x] make `all` run the other commands
 - [x] add simple progress and logging
-- [ ] add safeguards (confirmation, dry-run flag)
+- [x] add safeguards (confirmation, dry-run flag)
 - [ ] decent code architecture
 - [ ] installation and run process
 
