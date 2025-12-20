@@ -166,13 +166,6 @@ def _create_command_handlers():
 
 
 _command_handlers = _create_command_handlers()
-run_posts = _command_handlers["posts"]
-run_medias = _command_handlers["medias"]
-run_likes = _command_handlers["likes"]
-run_reposts = _command_handlers["reposts"]
-run_quotes = _command_handlers["quotes"]
-run_follows = _command_handlers["follows"]
-run_bookmarks = _command_handlers["bookmarks"]
 
 
 def run_all(skip_confirmation: bool = False):
