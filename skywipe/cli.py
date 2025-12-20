@@ -14,7 +14,7 @@ def create_parser():
 
     parser = argparse.ArgumentParser(
         description="Clean your bluesky account with style.",
-        epilog="WARNING: This tool performs destructive operations. Only use it if you intend to erase data from your Bluesky account."
+        epilog="WARNING: This tool deletes your Bluesky data permanently."
     )
 
     parser.add_argument(
