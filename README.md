@@ -24,6 +24,14 @@ uv sync
 
 Then start coding.
 
+If you want to test your changes, you can run the tool with:
+
+```bash
+uv run python -m skywipe.cli -h
+uv run python -m skywipe.cli all
+# or any other command
+```
+
 ## Installation
 
 Use [`pipx`](https://pipx.pypa.io/latest/installation/) to install `skywipe`:
