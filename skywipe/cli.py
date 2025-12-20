@@ -6,7 +6,7 @@ from pathlib import Path
 
 from .commands import registry
 from .configure import Configuration
-from .logger import setup_logger, get_logger
+from .logger import setup_logger, get_logger, handle_error
 
 
 LOG_FILE = Path.home() / ".cache" / "skywipe" / "skywipe.log"
@@ -39,10 +39,9 @@ def create_parser():
     return parser
 
 
-def require_config():
+def require_config(logger):
     config = Configuration()
     if not config.exists():
-        logger = get_logger()
         logger.error("Configuration file not found.")
         logger.error("You must run 'skywipe configure' first.")
         sys.exit(1)
@@ -53,9 +52,10 @@ def main():
     args = parser.parse_args()
 
     setup_logger(verbose=False, log_file=LOG_FILE)
+    logger = get_logger()
 
     if registry.requires_config(args.command):
-        require_config()
+        require_config(logger)
         config = Configuration()
         config_data = config.load()
         verbose = config_data.get("verbose", False)
@@ -64,14 +64,8 @@ def main():
     try:
         registry.execute(
             args.command, skip_confirmation=getattr(args, "yes", False))
-    except ValueError as e:
-        logger = get_logger()
-        logger.error(f"{e}")
-        sys.exit(1)
-    except Exception as e:
-        logger = get_logger()
-        logger.error(f"Unexpected error: {e}", exc_info=True)
-        sys.exit(1)
+    except (ValueError, Exception) as e:
+        handle_error(e, logger, exit_on_error=True)
 
 
 if __name__ == '__main__':
