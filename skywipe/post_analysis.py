@@ -14,6 +14,11 @@ class PostAnalyzer:
         'app.bsky.embed.record_with_media'
     }
 
+    QUOTE_WITH_MEDIA_TYPES = {
+        'app.bsky.embed.recordWithMedia',
+        'app.bsky.embed.record_with_media'
+    }
+
     @staticmethod
     def has_media(post_record):
         embed = getattr(post_record, 'embed', None)
@@ -27,7 +32,7 @@ class PostAnalyzer:
             if embed_type_base in PostAnalyzer.MEDIA_TYPES:
                 return True
 
-            if embed_type_base in ('app.bsky.embed.recordWithMedia', 'app.bsky.embed.record_with_media'):
+            if embed_type_base in PostAnalyzer.QUOTE_WITH_MEDIA_TYPES:
                 media = getattr(embed, 'media', None)
                 if media:
                     media_type = getattr(media, 'py_type', None)
