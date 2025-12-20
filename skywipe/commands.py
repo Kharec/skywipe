@@ -9,6 +9,7 @@ from .reposts import undo_reposts
 from .quotes import delete_quotes_posts
 from .follows import unfollow_all
 from .bookmarks import delete_bookmarks
+from .logger import get_logger
 
 
 CommandHandler = Callable[[], None]
@@ -88,14 +89,19 @@ def run_bookmarks():
 
 
 def run_all():
+    logger = get_logger()
     commands = ["posts", "likes", "reposts", "follows", "bookmarks"]
 
+    logger.info("Running all cleanup commands...")
     for cmd in commands:
         try:
+            logger.info(f"Starting command: {cmd}")
             registry.execute(cmd)
+            logger.info(f"Completed command: {cmd}")
         except Exception as e:
-            print(f"Error running '{cmd}': {e}")
+            logger.error(f"Error running '{cmd}': {e}", exc_info=True)
             continue
+    logger.info("All commands completed.")
 
 
 registry.register("configure", run_configure,

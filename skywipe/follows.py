@@ -4,12 +4,14 @@ import time
 from atproto import models
 from .auth import Auth
 from .configure import Configuration
+from .logger import get_logger, ProgressTracker
 
 
 FOLLOW_COLLECTION = "app.bsky.graph.follow"
 
 
 def unfollow_all():
+    logger = get_logger()
     auth = Auth()
     client = auth.login()
     config = Configuration()
@@ -17,17 +19,18 @@ def unfollow_all():
 
     batch_size = config_data.get("batch_size", 10)
     delay = config_data.get("delay", 1)
-    verbose = config_data.get("verbose", False)
 
-    if verbose:
-        print(
-            f"Starting unfollow operation with batch_size={batch_size}, delay={delay}s")
+    logger.info(
+        f"Starting unfollow operation with batch_size={batch_size}, delay={delay}s")
 
     did = client.me.did
     cursor = None
     total_unfollowed = 0
+    batch_num = 0
+    progress = ProgressTracker(operation="Unfollowing accounts")
 
     while True:
+        batch_num += 1
         list_params = models.ComAtprotoRepoListRecords.Params(
             repo=did,
             collection=FOLLOW_COLLECTION,
@@ -41,6 +44,8 @@ def unfollow_all():
         if not records:
             break
 
+        progress.batch(batch_num, len(records))
+
         for record in records:
             try:
                 record_uri = record.uri
@@ -52,12 +57,11 @@ def unfollow_all():
                 }
                 client.com.atproto.repo.delete_record(data=delete_data)
                 total_unfollowed += 1
-                if verbose:
-                    print(f"Unfollowed: {record_uri}")
+                progress.update(1)
+                logger.debug(f"Unfollowed: {record_uri}")
             except Exception as e:
                 record_uri = getattr(record, "uri", "unknown")
-                if verbose:
-                    print(f"Error unfollowing {record_uri}: {e}")
+                logger.error(f"Error unfollowing {record_uri}: {e}")
 
         cursor = response.cursor
         if not cursor:
@@ -66,4 +70,4 @@ def unfollow_all():
         if delay > 0:
             time.sleep(delay)
 
-    print(f"Unfollowed {total_unfollowed} accounts.")
+    logger.info(f"Unfollowed {total_unfollowed} accounts.")

@@ -4,9 +4,11 @@ import time
 from atproto import models
 from .auth import Auth
 from .configure import Configuration
+from .logger import get_logger, ProgressTracker
 
 
 def delete_bookmarks():
+    logger = get_logger()
     auth = Auth()
     client = auth.login()
     config = Configuration()
@@ -14,16 +16,17 @@ def delete_bookmarks():
 
     batch_size = config_data.get("batch_size", 10)
     delay = config_data.get("delay", 1)
-    verbose = config_data.get("verbose", False)
 
-    if verbose:
-        print(
-            f"Starting bookmark deletion with batch_size={batch_size}, delay={delay}s")
+    logger.info(
+        f"Starting bookmark deletion with batch_size={batch_size}, delay={delay}s")
 
     cursor = None
     total_deleted = 0
+    batch_num = 0
+    progress = ProgressTracker(operation="Deleting bookmarks")
 
     while True:
+        batch_num += 1
         get_params = models.AppBskyBookmarkGetBookmarks.Params(
             limit=batch_size,
             cursor=cursor
@@ -34,6 +37,8 @@ def delete_bookmarks():
         bookmarks = response.bookmarks
         if not bookmarks:
             break
+
+        progress.batch(batch_num, len(bookmarks))
 
         for bookmark in bookmarks:
             try:
@@ -49,8 +54,7 @@ def delete_bookmarks():
                                 break
 
                 if not bookmark_uri:
-                    if verbose:
-                        print(f"Skipping bookmark: unable to find uri")
+                    logger.debug("Skipping bookmark: unable to find uri")
                     continue
 
                 delete_data = models.AppBskyBookmarkDeleteBookmark.Data(
@@ -58,12 +62,11 @@ def delete_bookmarks():
                 )
                 client.app.bsky.bookmark.delete_bookmark(data=delete_data)
                 total_deleted += 1
-                if verbose:
-                    print(f"Deleted bookmark: {bookmark_uri}")
+                progress.update(1)
+                logger.debug(f"Deleted bookmark: {bookmark_uri}")
             except Exception as e:
                 bookmark_uri = getattr(bookmark, "uri", "unknown")
-                if verbose:
-                    print(f"Error deleting bookmark {bookmark_uri}: {e}")
+                logger.error(f"Error deleting bookmark {bookmark_uri}: {e}")
 
         cursor = response.cursor
         if not cursor:
@@ -72,4 +75,4 @@ def delete_bookmarks():
         if delay > 0:
             time.sleep(delay)
 
-    print(f"Deleted {total_deleted} bookmarks.")
+    logger.info(f"Deleted {total_deleted} bookmarks.")

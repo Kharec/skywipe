@@ -3,9 +3,11 @@
 import time
 from .auth import Auth
 from .configure import Configuration
+from .logger import get_logger, ProgressTracker
 
 
 def delete_quotes_posts():
+    logger = get_logger()
     auth = Auth()
     client = auth.login()
     config = Configuration()
@@ -13,23 +15,25 @@ def delete_quotes_posts():
 
     batch_size = config_data.get("batch_size", 10)
     delay = config_data.get("delay", 1)
-    verbose = config_data.get("verbose", False)
 
-    if verbose:
-        print(
-            f"Starting quote post deletion with batch_size={batch_size}, delay={delay}s")
+    logger.info(f"Starting quote post deletion with batch_size={batch_size}, delay={delay}s")
 
     did = client.me.did
     cursor = None
     total_deleted = 0
+    batch_num = 0
+    progress = ProgressTracker(operation="Deleting quote posts")
 
     while True:
+        batch_num += 1
         response = client.get_author_feed(
             actor=did, limit=batch_size, cursor=cursor)
 
         posts = response.feed
         if not posts:
             break
+
+        progress.batch(batch_num, len(posts))
 
         for post in posts:
             post_record = post.post
@@ -52,18 +56,16 @@ def delete_quotes_posts():
                     has_quote = True
 
             if not has_quote:
-                if verbose:
-                    print(f"Skipping post without quote: {post_record.uri}")
+                logger.debug(f"Skipping post without quote: {post_record.uri}")
                 continue
 
             try:
                 client.delete_post(post_record.uri)
                 total_deleted += 1
-                if verbose:
-                    print(f"Deleted quote post: {post_record.uri}")
+                progress.update(1)
+                logger.debug(f"Deleted quote post: {post_record.uri}")
             except Exception as e:
-                if verbose:
-                    print(f"Error deleting quote post {post_record.uri}: {e}")
+                logger.error(f"Error deleting quote post {post_record.uri}: {e}")
 
         cursor = response.cursor
         if not cursor:
@@ -72,4 +74,4 @@ def delete_quotes_posts():
         if delay > 0:
             time.sleep(delay)
 
-    print(f"Deleted {total_deleted} quote posts.")
+    logger.info(f"Deleted {total_deleted} quote posts.")

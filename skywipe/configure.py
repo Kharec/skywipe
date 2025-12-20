@@ -3,6 +3,7 @@
 import getpass
 from pathlib import Path
 import yaml
+from .logger import setup_logger, get_logger
 
 
 class Configuration:
@@ -13,10 +14,12 @@ class Configuration:
         return self.config_file.exists()
 
     def create(self):
+        logger = setup_logger(verbose=False)
         if self.exists():
             overwrite = input(
                 "Configuration already exists. Overwrite? (y/N): ").strip().lower()
             if overwrite not in ("y", "yes"):
+                logger.info("Configuration creation cancelled.")
                 return
 
         config_dir = self.config_file.parent
@@ -37,7 +40,7 @@ class Configuration:
             batch_size = int(batch_size)
             delay = int(delay)
         except ValueError:
-            print("Error: batch_size and delay must be integers")
+            logger.error("batch_size and delay must be integers")
             return
 
         config_data = {
@@ -51,7 +54,7 @@ class Configuration:
         with open(self.config_file, "w") as f:
             yaml.dump(config_data, f, default_flow_style=False)
 
-        print(f"\nConfiguration saved to {self.config_file}")
+        logger.info(f"Configuration saved to {self.config_file}")
 
     def load(self) -> dict:
         if not self.exists():
