@@ -1,6 +1,6 @@
 # Skywipe
 
-Skywipe is a work-in-progress Python 3.13+ CLI that helps you wipe data from your Bluesky account using the AT Protocol SDK.
+Skywipe is a Python 3.13+ CLI that helps you wipe data from your Bluesky account using the AT Protocol SDK.
 
 **Warning:** This tool performs _**destructive operations**_.
 
@@ -8,7 +8,11 @@ Only use it if you intend to permanently erase data from your Bluesky account.
 
 ## Requirements
 
-Check [pyproject.toml](pyproject.toml).
+Python 3.13+.
+
+The rest of the dependencies are listed in [pyproject.toml](pyproject.toml).
+
+## Hacking
 
 You can use `uv` to install dependencies:
 
@@ -18,25 +22,23 @@ cd skywipe
 uv sync
 ```
 
-## How to run
+Then start coding.
 
-While it's being developed, you can use the tool using `uv` :
+## Installation
+
+Use [`pipx`](https://pipx.pypa.io/latest/installation/) to install `skywipe`:
 
 ```bash
-uv run python -m skywipe.cli all            # target everything
-uv run python -m skywipe.cli configure      # create configuration
-uv run python -m skywipe.cli posts          # delete posts
-uv run python -m skywipe.cli medias         # delete posts with medias
-uv run python -m skywipe.cli likes          # undo likes
-uv run python -m skywipe.cli reposts        # undo reposts
-uv run python -m skywipe.cli quotes         # delete quotes
-uv run python -m skywipe.cli follows        # unfollow all
-uv run python -m skywipe.cli bookmarks      # delete bookmarks
+pipx install git+https://git.kharec.info/Kharec/skywipe.git
 ```
 
-Use the `--yes` flag to skip the confirmation prompt and proceed with the operation.
+Run the tool and see available commands with:
 
-A log of the operations will be saved in `~/.cache/skywipe/skywipe.log`.
+```bash
+skywipe -h
+```
+
+Use the `--yes` flag to skip the confirmation prompt and proceed with the operation. A log of the operations will be saved in `~/.cache/skywipe/skywipe.log`.
 
 ## Configuration
 
@@ -51,24 +53,6 @@ verbose: true
 ```
 
 BE SURE TO USE A [BLUESKY APP PASSWORD](https://blueskyfeeds.com/faq-app-password) FOR OBVIOUS SECURITY REASONS.
-
-## Roadmap
-
-- [x] build cli parameter management
-- [x] handle configuration logic
-- [x] sign in to at protocol
-- [x] delete posts in batch
-- [x] only delete posts with media
-- [x] undo likes
-- [x] undo reposts
-- [x] delete quotes
-- [x] unfollow accounts
-- [x] remove bookmarks
-- [x] make `all` run the other commands
-- [x] add simple progress and logging
-- [x] add safeguards (confirmation, dry-run flag)
-- [x] decent code architecture
-- [ ] installation and run process
 
 ## License
 
