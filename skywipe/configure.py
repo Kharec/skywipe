@@ -3,7 +3,7 @@
 import getpass
 from pathlib import Path
 import yaml
-from .logger import setup_logger, get_logger
+from .logger import setup_logger
 
 
 class Configuration:
