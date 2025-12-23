@@ -52,7 +52,12 @@ cd skywipe
 uv sync
 ```
 
-Then start coding.
+Run unit tests with:
+
+```bash
+uv sync --extra dev
+uv run pytest
+```
 
 If you want to test your changes, you can run the tool with:
 
