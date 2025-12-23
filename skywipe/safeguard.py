@@ -2,14 +2,17 @@
 
 import sys
 import logging
-from typing import Optional
 from .logger import get_logger
 
 
 CONFIRM_RESPONSES = {"yes", "y"}
 
 
-def require_confirmation(operation: str, skip_confirmation: bool = False, logger: Optional[logging.Logger] = None) -> None:
+def require_confirmation(
+    operation: str,
+    skip_confirmation: bool = False,
+    logger: logging.Logger | None = None
+) -> None:
     if skip_confirmation:
         return
 

@@ -1,7 +1,7 @@
 """Shared operation utilities and strategies for Skywipe"""
 
 import time
-from typing import Callable, Optional, Any
+from typing import Callable, Any
 from atproto import models
 
 from .auth import Auth
@@ -60,7 +60,7 @@ class RecordDeletionStrategy(BaseStrategy):
     def __init__(self, collection: str):
         self.collection = collection
 
-    def fetch(self, context: OperationContext, cursor: Optional[str] = None):
+    def fetch(self, context: OperationContext, cursor: str | None = None):
         list_params = models.ComAtprotoRepoListRecords.Params(
             repo=context.did,
             collection=self.collection,
@@ -85,7 +85,7 @@ class RecordDeletionStrategy(BaseStrategy):
 
 
 class FeedStrategy(BaseStrategy):
-    def fetch(self, context: OperationContext, cursor: Optional[str] = None):
+    def fetch(self, context: OperationContext, cursor: str | None = None):
         if cursor:
             return context.client.get_author_feed(
                 actor=context.did, limit=context.batch_size, cursor=cursor
@@ -102,7 +102,7 @@ class FeedStrategy(BaseStrategy):
 
 
 class BookmarkStrategy(BaseStrategy):
-    def fetch(self, context: OperationContext, cursor: Optional[str] = None):
+    def fetch(self, context: OperationContext, cursor: str | None = None):
         get_params = models.AppBskyBookmarkGetBookmarks.Params(
             limit=context.batch_size,
             cursor=cursor
@@ -139,8 +139,8 @@ class Operation:
         self,
         operation_name: str,
         strategy_type: str = "feed",
-        collection: Optional[str] = None,
-        filter_fn: Optional[Callable[[Any], bool]] = None,
+        collection: str | None = None,
+        filter_fn: Callable[[Any], bool] | None = None,
         client=None,
         config_data=None
     ):

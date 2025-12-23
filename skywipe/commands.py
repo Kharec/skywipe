@@ -1,6 +1,6 @@
 """Command implementations for Skywipe"""
 
-from typing import Callable, Dict, Optional, Any
+from typing import Callable, Any
 from .configure import Configuration
 from .operations import Operation
 from .post_analysis import PostAnalyzer
@@ -98,16 +98,16 @@ class CommandRegistry:
         self._help_texts[name] = help_text
         self._requires_config[name] = requires_config
 
-    def get_handler(self, name: str) -> Optional[CommandHandler]:
+    def get_handler(self, name: str) -> CommandHandler | None:
         return self._commands.get(name)
 
-    def get_help_text(self, name: str) -> Optional[str]:
+    def get_help_text(self, name: str) -> str | None:
         return self._help_texts.get(name)
 
     def requires_config(self, name: str) -> bool:
         return self._requires_config.get(name, True)
 
-    def get_all_commands(self) -> Dict[str, str]:
+    def get_all_commands(self) -> dict[str, str]:
         return self._help_texts.copy()
 
     def execute(self, name: str, skip_confirmation: bool = False):
@@ -128,8 +128,8 @@ def _create_operation_handler(
     confirmation_message: str,
     operation_name: str,
     strategy_type: str = "feed",
-    collection: Optional[str] = None,
-    filter_fn: Optional[Callable[[Any], bool]] = None
+    collection: str | None = None,
+    filter_fn: Callable[[Any], bool] | None = None
 ) -> CommandHandler:
     logger = get_logger()
 

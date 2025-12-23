@@ -3,7 +3,6 @@
 import logging
 import sys
 from pathlib import Path
-from typing import Optional
 
 
 class ProgressTracker:
@@ -14,7 +13,7 @@ class ProgressTracker:
     def update(self, count: int = 1):
         self.current += count
 
-    def batch(self, batch_num: int, batch_size: int, total_batches: Optional[int] = None):
+    def batch(self, batch_num: int, batch_size: int, total_batches: int | None = None):
         logger = logging.getLogger("skywipe.progress")
         if total_batches:
             logger.info(
@@ -35,7 +34,7 @@ class LevelFilter(logging.Filter):
         return self.min_level <= record.levelno <= self.max_level
 
 
-def setup_logger(verbose: bool = False, log_file: Optional[Path] = None) -> logging.Logger:
+def setup_logger(verbose: bool = False, log_file: Path | None = None) -> logging.Logger:
     logger = logging.getLogger("skywipe")
     target_level = logging.DEBUG if verbose else logging.INFO
     logger.setLevel(target_level)
