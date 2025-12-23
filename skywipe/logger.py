@@ -45,13 +45,13 @@ def setup_logger(verbose: bool = False, log_file: Optional[Path] = None) -> logg
     file_handlers = []
 
     for handler in logger.handlers:
-        if isinstance(handler, logging.StreamHandler):
+        if isinstance(handler, logging.FileHandler):
+            file_handlers.append(handler)
+        elif isinstance(handler, logging.StreamHandler):
             if handler.stream == sys.stdout:
                 info_handler = handler
             elif handler.stream == sys.stderr:
                 error_handler = handler
-        elif isinstance(handler, logging.FileHandler):
-            file_handlers.append(handler)
 
     formatter = logging.Formatter(fmt="%(levelname)s: %(message)s")
 
