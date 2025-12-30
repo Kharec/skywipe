@@ -67,10 +67,11 @@ def setup_logger(verbose: bool = False, log_file: Path | None = None) -> logging
         error_handler.setFormatter(formatter)
         logger.addHandler(error_handler)
 
+    for handler in file_handlers:
+        handler.close()
+        logger.removeHandler(handler)
+
     if log_file:
-        for handler in file_handlers:
-            handler.close()
-            logger.removeHandler(handler)
         log_file.parent.mkdir(parents=True, exist_ok=True)
         file_handler = logging.FileHandler(log_file, encoding="utf-8")
         file_handler.setLevel(logging.DEBUG)
@@ -80,10 +81,6 @@ def setup_logger(verbose: bool = False, log_file: Path | None = None) -> logging
         )
         file_handler.setFormatter(file_formatter)
         logger.addHandler(file_handler)
-    else:
-        for handler in file_handlers:
-            handler.close()
-            logger.removeHandler(handler)
 
     return logger
 
