@@ -124,6 +124,47 @@ def test_setup_logger_does_not_duplicate_handlers():
     assert first_count == second_count
 
 
+def test_setup_logger_disables_propagation():
+    root_logger = logging.getLogger()
+    root_messages = []
+    original_root_level = root_logger.level
+
+    class RootHandler(logging.Handler):
+        def emit(self, record):
+            root_messages.append(self.format(record))
+
+    root_handler = RootHandler()
+    root_handler.setLevel(logging.INFO)
+    root_logger.addHandler(root_handler)
+    root_logger.setLevel(logging.INFO)
+
+    logger = logging.getLogger("skywipe")
+    original_handlers = list(logger.handlers)
+    for handler in original_handlers:
+        logger.removeHandler(handler)
+
+    try:
+        setup_logger(verbose=False)
+        assert logger.propagate is False
+
+        progress_logger = logging.getLogger("skywipe.progress")
+        assert progress_logger.propagate is False
+
+        logger.info("Test message")
+        progress_logger.info("Progress message")
+
+        assert len(root_messages) == 0
+    finally:
+        root_handler.close()
+        root_logger.removeHandler(root_handler)
+        root_logger.setLevel(original_root_level)
+        for handler in list(logger.handlers):
+            handler.close()
+            logger.removeHandler(handler)
+        for handler in original_handlers:
+            logger.addHandler(handler)
+
+
 def test_setup_logger_file_handler_lifecycle(tmp_path):
     logger = logging.getLogger("skywipe")
     original_handlers = list(logger.handlers)
