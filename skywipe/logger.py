@@ -61,15 +61,15 @@ def setup_logger(verbose: bool = False, log_file: Path | None = None) -> logging
     if info_handler is None:
         info_handler = logging.StreamHandler(sys.stdout)
         info_handler.addFilter(LevelFilter(logging.DEBUG, logging.INFO))
-        info_handler.setFormatter(formatter)
         logger.addHandler(info_handler)
+    info_handler.setFormatter(formatter)
     info_handler.setLevel(target_level)
 
     if error_handler is None:
         error_handler = logging.StreamHandler(sys.stderr)
         error_handler.setLevel(logging.WARNING)
-        error_handler.setFormatter(formatter)
         logger.addHandler(error_handler)
+    error_handler.setFormatter(formatter)
 
     for handler in file_handlers:
         handler.close()
