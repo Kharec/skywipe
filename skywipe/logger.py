@@ -15,7 +15,7 @@ class ProgressTracker:
 
     def batch(self, batch_num: int, batch_size: int, total_batches: int | None = None):
         logger = logging.getLogger("skywipe.progress")
-        if total_batches:
+        if total_batches is not None:
             logger.info(
                 f"{self.operation} - batch {batch_num}/{total_batches} ({batch_size} items)"
             )
