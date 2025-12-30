@@ -1,4 +1,5 @@
 import logging
+import sys
 
 from skywipe.logger import LevelFilter, ProgressTracker, setup_logger
 
@@ -48,11 +49,27 @@ def test_setup_logger_does_not_duplicate_handlers():
 
     try:
         setup_logger(verbose=False)
-        first_count = len(logger.handlers)
+        first_handlers = list(logger.handlers)
+        stream_handlers = [
+            handler for handler in first_handlers
+            if isinstance(handler, logging.StreamHandler)
+        ]
+        assert len(stream_handlers) == 2
+        assert {handler.stream for handler in stream_handlers} == {
+            sys.stdout,
+            sys.stderr,
+        }
+        assert not any(
+            isinstance(handler, logging.FileHandler)
+            for handler in first_handlers
+        )
+
+        first_count = len(first_handlers)
         setup_logger(verbose=False)
         second_count = len(logger.handlers)
     finally:
         for handler in list(logger.handlers):
+            handler.close()
             logger.removeHandler(handler)
         for handler in original_handlers:
             logger.addHandler(handler)
