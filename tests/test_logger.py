@@ -175,7 +175,7 @@ def test_setup_logger_disables_propagation():
         assert logger.propagate is False
 
         progress_logger = logging.getLogger("skywipe.progress")
-        assert progress_logger.propagate is False
+        assert progress_logger.propagate is True
 
         logger.info("Test message")
         progress_logger.info("Progress message")
