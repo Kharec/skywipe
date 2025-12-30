@@ -87,3 +87,34 @@ def test_setup_logger_file_handler_lifecycle(tmp_path):
             logger.removeHandler(handler)
         for handler in original_handlers:
             logger.addHandler(handler)
+
+
+def test_setup_logger_replaces_file_handler_when_path_changes(tmp_path):
+    logger = logging.getLogger("skywipe")
+    original_handlers = list(logger.handlers)
+    for handler in original_handlers:
+        logger.removeHandler(handler)
+
+    log_file1 = tmp_path / "skywipe1.log"
+    log_file2 = tmp_path / "skywipe2.log"
+    try:
+        setup_logger(verbose=False, log_file=log_file1)
+        file_handlers = [
+            handler for handler in logger.handlers
+            if isinstance(handler, logging.FileHandler)
+        ]
+        assert len(file_handlers) == 1
+        assert file_handlers[0].baseFilename == str(log_file1)
+
+        setup_logger(verbose=False, log_file=log_file2)
+        file_handlers = [
+            handler for handler in logger.handlers
+            if isinstance(handler, logging.FileHandler)
+        ]
+        assert len(file_handlers) == 1
+        assert file_handlers[0].baseFilename == str(log_file2)
+    finally:
+        for handler in list(logger.handlers):
+            logger.removeHandler(handler)
+        for handler in original_handlers:
+            logger.addHandler(handler)
