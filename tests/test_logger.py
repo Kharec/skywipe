@@ -124,6 +124,33 @@ def test_setup_logger_does_not_duplicate_handlers():
     assert first_count == second_count
 
 
+def test_setup_logger_resets_stream_formatters():
+    logger = logging.getLogger("skywipe")
+    original_handlers = list(logger.handlers)
+    for handler in original_handlers:
+        logger.removeHandler(handler)
+
+    try:
+        setup_logger(verbose=False)
+        alt_formatter = logging.Formatter(fmt="%(message)s")
+        for handler in logger.handlers:
+            if isinstance(handler, logging.StreamHandler):
+                handler.setFormatter(alt_formatter)
+
+        setup_logger(verbose=False)
+
+        for handler in logger.handlers:
+            if isinstance(handler, logging.StreamHandler):
+                assert handler.formatter is not None
+                assert handler.formatter._fmt == "%(levelname)s: %(message)s"
+    finally:
+        for handler in list(logger.handlers):
+            handler.close()
+            logger.removeHandler(handler)
+        for handler in original_handlers:
+            logger.addHandler(handler)
+
+
 def test_setup_logger_disables_propagation():
     root_logger = logging.getLogger()
     root_messages = []
