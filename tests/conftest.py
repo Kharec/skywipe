@@ -1,6 +1,9 @@
+from pathlib import Path
 from typing import Iterable, Callable
 
 import pytest
+
+from skywipe.configure import Configuration
 
 
 @pytest.fixture
@@ -14,3 +17,9 @@ def user_input(monkeypatch) -> Callable[[Iterable[str], Iterable[str]], None]:
                             lambda _prompt: next(password_iter))
 
     return _set
+
+
+@pytest.fixture
+def config_with_tmp_path(monkeypatch, tmp_path):
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+    return Configuration()
