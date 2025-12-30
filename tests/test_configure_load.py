@@ -1,16 +1,7 @@
-from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 import yaml
-
-from skywipe.configure import Configuration
-
-
-@pytest.fixture
-def config_with_tmp_path(monkeypatch, tmp_path):
-    monkeypatch.setattr(Path, "home", lambda: tmp_path)
-    return Configuration()
 
 
 def test_configuration_load_missing_file(config_with_tmp_path):

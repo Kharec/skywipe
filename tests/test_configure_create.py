@@ -1,11 +1,8 @@
 from pathlib import Path
-
 import yaml
 
-from skywipe.configure import Configuration
 
-
-def test_configuration_create_reprompts_and_writes_file(monkeypatch, tmp_path, user_input):
+def test_configuration_create_reprompts_and_writes_file(config_with_tmp_path, user_input):
     inputs = iter([
         "bad handle",
         "alice.bsky.social",
@@ -18,10 +15,9 @@ def test_configuration_create_reprompts_and_writes_file(monkeypatch, tmp_path, u
         "longenough",
     ])
 
-    monkeypatch.setattr(Path, "home", lambda: tmp_path)
     user_input(inputs, passwords)
 
-    config = Configuration()
+    config = config_with_tmp_path
     config.create()
 
     assert config.config_file.exists() is True
@@ -33,7 +29,7 @@ def test_configuration_create_reprompts_and_writes_file(monkeypatch, tmp_path, u
     assert data["verbose"] is False
 
 
-def test_configuration_create_invalid_batch_size(monkeypatch, tmp_path, user_input):
+def test_configuration_create_invalid_batch_size(config_with_tmp_path, user_input):
     inputs = iter([
         "alice.bsky.social",
         "0",
@@ -42,16 +38,15 @@ def test_configuration_create_invalid_batch_size(monkeypatch, tmp_path, user_inp
     ])
     passwords = iter(["longenough"])
 
-    monkeypatch.setattr(Path, "home", lambda: tmp_path)
     user_input(inputs, passwords)
 
-    config = Configuration()
+    config = config_with_tmp_path
     config.create()
 
     assert config.config_file.exists() is False
 
 
-def test_configuration_create_invalid_delay(monkeypatch, tmp_path, user_input):
+def test_configuration_create_invalid_delay(config_with_tmp_path, user_input):
     inputs = iter([
         "alice.bsky.social",
         "10",
@@ -60,18 +55,16 @@ def test_configuration_create_invalid_delay(monkeypatch, tmp_path, user_input):
     ])
     passwords = iter(["longenough"])
 
-    monkeypatch.setattr(Path, "home", lambda: tmp_path)
     user_input(inputs, passwords)
 
-    config = Configuration()
+    config = config_with_tmp_path
     config.create()
 
     assert config.config_file.exists() is False
 
 
-def test_configuration_create_overwrite_cancel(monkeypatch, tmp_path, user_input):
-    monkeypatch.setattr(Path, "home", lambda: tmp_path)
-    config = Configuration()
+def test_configuration_create_overwrite_cancel(config_with_tmp_path, user_input):
+    config = config_with_tmp_path
     config.config_file.parent.mkdir(parents=True, exist_ok=True)
     config.config_file.write_text("existing")
 
@@ -82,14 +75,13 @@ def test_configuration_create_overwrite_cancel(monkeypatch, tmp_path, user_input
     assert config.config_file.read_text() == "existing"
 
 
-def test_configuration_create_write_failure(monkeypatch, tmp_path, user_input):
-    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+def test_configuration_create_write_failure(config_with_tmp_path, user_input, monkeypatch):
     user_input(
         ["alice.bsky.social", "5", "0", "y"],
         ["longenough"],
     )
 
-    config = Configuration()
+    config = config_with_tmp_path
 
     original_open = open
 
