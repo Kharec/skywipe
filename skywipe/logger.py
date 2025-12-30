@@ -41,7 +41,7 @@ def setup_logger(verbose: bool = False, log_file: Path | None = None) -> logging
     logger.setLevel(target_level)
 
     progress_logger = logging.getLogger("skywipe.progress")
-    progress_logger.propagate = False
+    progress_logger.propagate = True
 
     info_handler = None
     error_handler = None
