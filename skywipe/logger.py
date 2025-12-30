@@ -36,8 +36,12 @@ class LevelFilter(logging.Filter):
 
 def setup_logger(verbose: bool = False, log_file: Path | None = None) -> logging.Logger:
     logger = logging.getLogger("skywipe")
+    logger.propagate = False
     target_level = logging.DEBUG if verbose else logging.INFO
     logger.setLevel(target_level)
+
+    progress_logger = logging.getLogger("skywipe.progress")
+    progress_logger.propagate = False
 
     info_handler = None
     error_handler = None
