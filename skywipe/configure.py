@@ -1,6 +1,6 @@
 """Core configuration module for Skywipe"""
 
-import getpass
+from getpass import getpass
 import re
 from pathlib import Path
 from typing import NamedTuple
@@ -81,7 +81,7 @@ class Configuration:
             logger.info("Please enter a valid handle and try again.")
 
         while True:
-            password = getpass.getpass(
+            password = getpass(
                 "Bluesky (hopefully app) password: ").strip()
             is_valid, error_msg = _validate_password(password)
             if is_valid:
