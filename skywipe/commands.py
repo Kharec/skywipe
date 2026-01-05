@@ -1,6 +1,6 @@
 """Command implementations for Skywipe"""
 
-from typing import Callable, Any
+from typing import Callable, Any, TypedDict
 from .configure import Configuration
 from .operations import Operation
 from .post_analysis import PostAnalyzer
@@ -11,7 +11,16 @@ from .safeguard import require_confirmation
 CommandHandler = Callable[..., None]
 
 
-COMMAND_METADATA = {
+class CommandMetadata(TypedDict):
+    confirmation: str
+    help_text: str
+    operation_name: str
+    strategy_type: str
+    collection: str | None
+    filter_fn: Callable[[Any], bool] | None
+
+
+COMMAND_METADATA: dict[str, CommandMetadata] = {
     "posts": {
         "confirmation": "delete all posts",
         "help_text": "only posts",
