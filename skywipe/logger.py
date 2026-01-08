@@ -94,7 +94,10 @@ def get_logger() -> logging.Logger:
 
 
 def handle_error(error: Exception, logger: logging.Logger, exit_on_error: bool = False) -> None:
-    if isinstance(error, ValueError):
+    if isinstance(error, KeyError):
+        message = error.args[0] if error.args else str(error)
+        logger.error(f"{message}")
+    elif isinstance(error, ValueError):
         logger.error(f"{error}")
     else:
         logger.error(f"Unexpected error: {error}", exc_info=True)
