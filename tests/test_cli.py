@@ -50,9 +50,14 @@ def _setup_error_mocks(monkeypatch, calls, error_factory):
     monkeypatch.setattr(cli, "get_logger",
                         lambda: logging.getLogger(TEST_LOGGER_NAME))
 
+    def _format_error_message(error):
+        if isinstance(error, KeyError):
+            return error.args[0] if error.args else str(error)
+        return str(error)
+
     def mock_handle_error(error, logger, exit_on_error=False):
         calls["handle_error"] = (type(error).__name__,
-                                 str(error), exit_on_error)
+                                 _format_error_message(error), exit_on_error)
 
     monkeypatch.setattr(cli, "handle_error", mock_handle_error)
 
@@ -186,9 +191,14 @@ def test_main_handles_config_load_error(monkeypatch):
     def raise_config_error(self):
         raise RuntimeError("config error")
 
+    def _format_error_message(error):
+        if isinstance(error, KeyError):
+            return error.args[0] if error.args else str(error)
+        return str(error)
+
     def mock_handle_error(error, logger, exit_on_error=False):
         calls["handle_error"] = (type(error).__name__,
-                                 str(error), exit_on_error)
+                                 _format_error_message(error), exit_on_error)
 
     _setup_parser_mocks(monkeypatch)
     monkeypatch.setattr(cli.registry, "requires_config", lambda name: True)
