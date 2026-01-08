@@ -61,14 +61,14 @@ def main():
     setup_logger(verbose=False, log_file=LOG_FILE)
     logger = get_logger()
 
-    if registry.requires_config(args.command):
-        require_config(logger)
-        config = Configuration()
-        config_data = config.load()
-        verbose = config_data.get("verbose", False)
-        setup_logger(verbose=verbose, log_file=LOG_FILE)
-
     try:
+        if registry.requires_config(args.command):
+            require_config(logger)
+            config = Configuration()
+            config_data = config.load()
+            verbose = config_data.get("verbose", False)
+            setup_logger(verbose=verbose, log_file=LOG_FILE)
+
         registry.execute(
             args.command, skip_confirmation=getattr(args, "yes", False))
     except (ValueError, Exception) as e:
