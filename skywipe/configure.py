@@ -56,65 +56,100 @@ class Configuration:
     def exists(self) -> bool:
         return self.config_file.exists()
 
-    def create(self):
-        logger = setup_logger(verbose=False)
-        if self.exists():
-            overwrite = input(
-                "Configuration already exists. Overwrite? (y/N): ").strip().lower()
-            if overwrite not in ("y", "yes"):
-                logger.info("Configuration creation cancelled.")
-                return
+    def _confirm_overwrite(self, logger) -> bool:
+        if not self.exists():
+            return True
+        overwrite = input(
+            "Configuration already exists. Overwrite? (y/N): ").strip().lower()
+        if overwrite in ("y", "yes"):
+            return True
+        logger.info("Configuration creation cancelled.")
+        return False
 
+    def _ensure_config_dir(self) -> None:
         config_dir = self.config_file.parent
         config_dir.mkdir(parents=True, exist_ok=True)
 
-        print("Skywipe Configuration")
-        print("=" * 50)
-        print("Note: You should use an app password from Bluesky settings.")
-
+    def _prompt_handle(self, logger) -> str:
         while True:
             handle = input("Bluesky handle: ").strip()
             is_valid, error_msg = _validate_handle(handle)
             if is_valid:
-                break
+                return handle
             logger.error(error_msg)
             logger.info("Please enter a valid handle and try again.")
 
+    def _prompt_password(self, logger) -> str:
         while True:
             password = getpass(
                 "Bluesky (hopefully app) password: ").strip()
             is_valid, error_msg = _validate_password(password)
             if is_valid:
-                break
+                return password
             logger.error(error_msg)
             logger.info("Please check your password and try again.")
             logger.info(
                 "Generate an app password at: https://bsky.app/settings/app-passwords")
 
+    def _parse_batch_size(self, logger) -> int | None:
         batch_size = input("Batch size (default: 10): ").strip() or "10"
-        delay = input(
-            "Delay between batches in seconds (default: 1): ").strip() or "1"
-        verbose_input = input(
-            "Verbose mode (y/n, default: y): ").strip().lower() or "y"
-        verbose = verbose_input in ("y", "yes", "true", "1")
-
         try:
-            batch_size = int(batch_size)
-            if batch_size < 1 or batch_size > 100:
-                logger.error("batch_size must be between 1 and 100")
-                return
+            batch_size_int = int(batch_size)
         except ValueError:
             logger.error("batch_size must be an integer")
-            return
+            return None
+        if batch_size_int < 1 or batch_size_int > 100:
+            logger.error("batch_size must be between 1 and 100")
+            return None
+        return batch_size_int
 
+    def _parse_delay(self, logger) -> int | None:
+        delay = input(
+            "Delay between batches in seconds (default: 1): ").strip() or "1"
         try:
-            delay = int(delay)
-            if delay < 0 or delay > 60:
-                logger.error("delay must be between 0 and 60 seconds")
-                return
+            delay_int = int(delay)
         except ValueError:
             logger.error("delay must be an integer")
+            return None
+        if delay_int < 0 or delay_int > 60:
+            logger.error("delay must be between 0 and 60 seconds")
+            return None
+        return delay_int
+
+    def _parse_verbose(self) -> bool:
+        verbose_input = input(
+            "Verbose mode (y/n, default: y): ").strip().lower() or "y"
+        return verbose_input in ("y", "yes", "true", "1")
+
+    def _write_config(self, logger, config_data: dict) -> None:
+        try:
+            with open(self.config_file, "w") as f:
+                yaml.dump(config_data, f, default_flow_style=False)
+        except (IOError, OSError) as e:
+            logger.error(f"Failed to save configuration: {e}")
             return
+        logger.info(f"Configuration saved to {self.config_file}")
+
+    def create(self):
+        logger = setup_logger(verbose=False)
+        if not self._confirm_overwrite(logger):
+            return
+
+        self._ensure_config_dir()
+
+        print("Skywipe Configuration")
+        print("=" * 50)
+        print("Note: You should use an app password from Bluesky settings.")
+
+        handle = self._prompt_handle(logger)
+        password = self._prompt_password(logger)
+        batch_size = self._parse_batch_size(logger)
+        if batch_size is None:
+            return
+        delay = self._parse_delay(logger)
+        if delay is None:
+            return
+        verbose = self._parse_verbose()
 
         config_data = {
             "handle": handle,
@@ -124,14 +159,7 @@ class Configuration:
             "verbose": verbose
         }
 
-        try:
-            with open(self.config_file, "w") as f:
-                yaml.dump(config_data, f, default_flow_style=False)
-        except (IOError, OSError) as e:
-            logger.error(f"Failed to save configuration: {e}")
-            return
-
-        logger.info(f"Configuration saved to {self.config_file}")
+        self._write_config(logger, config_data)
 
     def load(self) -> dict:
         if not self.exists():
