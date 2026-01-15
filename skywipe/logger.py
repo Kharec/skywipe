@@ -41,7 +41,8 @@ def setup_logger(verbose: bool = False, log_file: Path | None = None) -> logging
     logger.setLevel(target_level)
 
     progress_logger = logging.getLogger("skywipe.progress")
-    progress_logger.propagate = True
+    if not progress_logger.handlers:
+        progress_logger.propagate = True
 
     info_handler = None
     error_handler = None
@@ -60,8 +61,11 @@ def setup_logger(verbose: bool = False, log_file: Path | None = None) -> logging
 
     if info_handler is None:
         info_handler = logging.StreamHandler(sys.stdout)
-        info_handler.addFilter(LevelFilter(logging.DEBUG, logging.INFO))
         logger.addHandler(info_handler)
+    for existing in list(info_handler.filters):
+        if isinstance(existing, LevelFilter):
+            info_handler.removeFilter(existing)
+    info_handler.addFilter(LevelFilter(logging.DEBUG, logging.INFO))
     info_handler.setFormatter(formatter)
     info_handler.setLevel(target_level)
 
@@ -93,14 +97,18 @@ def get_logger() -> logging.Logger:
     return logging.getLogger("skywipe")
 
 
-def handle_error(error: Exception, logger: logging.Logger, exit_on_error: bool = False) -> None:
+def _format_error_message(error: Exception) -> str:
     if isinstance(error, KeyError):
-        message = error.args[0] if error.args else str(error)
-        logger.error(f"{message}")
-    elif isinstance(error, ValueError):
-        logger.error(f"{error}")
+        return str(error.args[0]) if error.args else str(error)
+    return str(error)
+
+
+def handle_error(error: Exception, logger: logging.Logger, exit_on_error: bool = False) -> None:
+    if isinstance(error, (KeyError, ValueError)):
+        logger.error(_format_error_message(error))
     else:
-        logger.error(f"Unexpected error: {error}", exc_info=True)
+        logger.error(
+            f"Unexpected error: {_format_error_message(error)}", exc_info=True)
 
     if exit_on_error:
         sys.exit(1)
