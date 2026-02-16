@@ -2,7 +2,7 @@
 
 from typing import Callable, Any, TypedDict
 from .configure import Configuration
-from .operations import Operation
+from .operations import Operation, OperationFetchError
 from .post_analysis import PostAnalyzer
 from .logger import get_logger, handle_error
 from .safeguard import require_confirmation
@@ -35,7 +35,7 @@ COMMAND_METADATA: dict[str, CommandMetadata] = {
         "operation_name": "Deleting posts with media",
         "strategy_type": "feed",
         "collection": None,
-        "filter_fn": lambda post: PostAnalyzer.has_media(post.post),
+        "filter_fn": lambda post: bool(PostAnalyzer.has_media(post.post)),
     },
     "likes": {
         "confirmation": "undo all likes",
@@ -59,7 +59,7 @@ COMMAND_METADATA: dict[str, CommandMetadata] = {
         "operation_name": "Deleting quote posts",
         "strategy_type": "feed",
         "collection": None,
-        "filter_fn": lambda post: PostAnalyzer.has_quote(post.post),
+        "filter_fn": lambda post: bool(PostAnalyzer.has_quote(post.post)),
     },
     "follows": {
         "confirmation": "unfollow all accounts",
@@ -101,7 +101,7 @@ class CommandRegistry:
         name: str,
         handler: CommandHandler,
         help_text: str,
-        requires_config: bool = True
+        requires_config: bool = True,
     ):
         self._commands[name] = handler
         self._help_texts[name] = help_text
@@ -138,7 +138,7 @@ def _create_operation_handler(
     operation_name: str,
     strategy_type: str = "feed",
     collection: str | None = None,
-    filter_fn: Callable[[Any], bool] | None = None
+    filter_fn: Callable[[Any], bool] | None = None,
 ) -> CommandHandler:
     logger = get_logger()
 
@@ -149,10 +149,11 @@ def _create_operation_handler(
                 operation_name,
                 strategy_type=strategy_type,
                 collection=collection,
-                filter_fn=filter_fn
+                filter_fn=filter_fn,
             ).run()
-        except (ValueError, Exception) as e:
+        except Exception as e:
             handle_error(e, logger)
+
     return handler
 
 
@@ -169,7 +170,7 @@ def _create_command_handlers():
             metadata["operation_name"],
             strategy_type=metadata["strategy_type"],
             collection=metadata["collection"],
-            filter_fn=metadata["filter_fn"]
+            filter_fn=metadata["filter_fn"],
         )
     return handlers
 
@@ -179,16 +180,19 @@ _command_handlers = _create_command_handlers()
 
 def run_all(skip_confirmation: bool = False):
     logger = get_logger()
+    fetch_failures: list[str] = []
 
     all_commands = registry.get_all_commands()
-    available_commands = [cmd for cmd in all_commands.keys()
-                          if cmd not in ("configure", "all")]
+    available_commands = [
+        cmd for cmd in all_commands.keys() if cmd not in ("configure", "all")
+    ]
 
-    commands = [cmd for cmd in COMMAND_EXECUTION_ORDER
-                if cmd in available_commands]
+    commands = [
+        cmd for cmd in COMMAND_EXECUTION_ORDER if cmd in available_commands]
 
-    commands.extend([cmd for cmd in available_commands
-                     if cmd not in COMMAND_EXECUTION_ORDER])
+    commands.extend(
+        [cmd for cmd in available_commands if cmd not in COMMAND_EXECUTION_ORDER]
+    )
 
     commands_str = ", ".join(commands)
     all_confirmation = f"run all cleanup commands ({commands_str})"
@@ -197,6 +201,7 @@ def run_all(skip_confirmation: bool = False):
     logger.info("Running all cleanup commands...")
 
     from .operations import OperationContext
+
     try:
         context = OperationContext()
         shared_client = context.client
@@ -217,19 +222,32 @@ def run_all(skip_confirmation: bool = False):
                     collection=metadata["collection"],
                     filter_fn=metadata["filter_fn"],
                     client=shared_client,
-                    config_data=shared_config_data
+                    config_data=shared_config_data,
                 ).run()
             else:
                 registry.execute(cmd, skip_confirmation=True)
             logger.info(f"Completed command: {cmd}")
+        except OperationFetchError as e:
+            fetch_failures.append(cmd)
+            logger.error(
+                f"Fetch error while running '{cmd}': {e}", exc_info=True)
+            continue
         except Exception as e:
             logger.error(f"Error running '{cmd}': {e}", exc_info=True)
             continue
+
+    if fetch_failures:
+        failed_commands = ", ".join(fetch_failures)
+        raise RuntimeError(
+            f"One or more commands failed while fetching items: {failed_commands}"
+        )
+
     logger.info("All commands completed.")
 
 
-registry.register("configure", run_configure,
-                  "create configuration", requires_config=False)
+registry.register(
+    "configure", run_configure, "create configuration", requires_config=False
+)
 for cmd, metadata in COMMAND_METADATA.items():
     registry.register(cmd, _command_handlers[cmd], metadata["help_text"])
 registry.register("all", run_all, "target everything")
