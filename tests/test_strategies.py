@@ -55,11 +55,9 @@ def test_record_deletion_strategy_fetch_and_process(monkeypatch):
 
     record = SimpleNamespace(uri="at://did:plc:fake/app.bsky.feed.like/abc123")
     strategy.process_item(record, context)
-    assert captured["delete"] == {
-        "repo": "did:plc:fake",
-        "collection": "app.bsky.feed.like",
-        "rkey": "abc123",
-    }
+    assert captured["delete"].repo == "did:plc:fake"
+    assert captured["delete"].collection == "app.bsky.feed.like"
+    assert captured["delete"].rkey == "abc123"
 
 
 def test_feed_strategy_fetch_and_process():
