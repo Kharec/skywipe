@@ -2,7 +2,7 @@ import time
 
 import pytest
 
-from skywipe.operations import Operation, BookmarkStrategy
+from skywipe.operations import Operation, BookmarkStrategy, OperationFetchError
 
 
 class FakeClient:
@@ -60,8 +60,40 @@ def test_operation_run_batches_filters_and_sleeps(monkeypatch):
 
     total = operation.run()
 
-    assert total == 2
+    assert total.processed == 2
+    assert total.failed == 1
+    assert total.skipped == 1
     assert slept == [1]
+
+
+def test_operation_run_raises_on_fetch_error(monkeypatch):
+    class FetchErrorStrategy:
+        def fetch(self, context, cursor=None):
+            raise RuntimeError("api down")
+
+        def extract_items(self, response):
+            return []
+
+        def process_item(self, item, context):
+            return None
+
+        def get_cursor(self, response):
+            return None
+
+    operation = Operation(
+        "Testing",
+        strategy_type="feed",
+        client=FakeClient(),
+        config_data={"batch_size": 2, "delay": 0},
+    )
+    operation.strategy = FetchErrorStrategy()
+
+    with pytest.raises(OperationFetchError, match="Failed to fetch items") as exc:
+        operation.run()
+
+    assert exc.value.result.processed == 0
+    assert exc.value.result.failed == 0
+    assert exc.value.result.skipped == 0
 
 
 def test_bookmark_strategy_extracts_uri_from_shapes():
