@@ -1,4 +1,5 @@
 import logging
+from types import SimpleNamespace
 
 import pytest
 
@@ -21,6 +22,7 @@ def test_create_operation_handler_calls_confirmation_and_run(monkeypatch):
 
         def run(self):
             calls["run"] += 1
+            return SimpleNamespace(processed=1, failed=0, skipped=0)
 
     monkeypatch.setattr(commands, "require_confirmation", fake_confirm)
     monkeypatch.setattr(commands, "Operation", FakeOperation)
@@ -77,6 +79,7 @@ def test_run_all_runs_in_order(monkeypatch):
 
         def run(self):
             ran.append(self.operation_name)
+            return SimpleNamespace(processed=1, failed=0, skipped=0)
 
     class FakeOperationContext:
         def __init__(self):
@@ -115,6 +118,7 @@ def test_run_all_continues_on_error(monkeypatch):
             ran.append(self.operation_name)
             if self.operation_name == "Deleting posts":
                 raise RuntimeError("fail")
+            return SimpleNamespace(processed=1, failed=0, skipped=0)
 
     class FakeOperationContext:
         def __init__(self):
@@ -130,3 +134,48 @@ def test_run_all_continues_on_error(monkeypatch):
 
     assert "Deleting posts" in ran
     assert len(ran) >= 2
+
+
+def test_run_all_raises_on_fetch_failure(monkeypatch):
+    class FakeOperation:
+        def __init__(self, operation_name, **kwargs):
+            self.operation_name = operation_name
+
+        def run(self):
+            if self.operation_name == "Deleting posts":
+                raise operations.OperationFetchError(
+                    "Deleting posts",
+                    1,
+                    RuntimeError("api unavailable"),
+                    operations.OperationResult(),
+                )
+            return SimpleNamespace(processed=1, failed=0, skipped=0)
+
+    class FakeOperationContext:
+        def __init__(self):
+            self.client = object()
+            self.config_data = {"batch_size": 1, "delay": 0}
+
+    monkeypatch.setattr(commands, "require_confirmation",
+                        lambda *args, **kwargs: None)
+    monkeypatch.setattr(commands, "Operation", FakeOperation)
+    monkeypatch.setattr(operations, "OperationContext", FakeOperationContext)
+    monkeypatch.setattr(
+        commands,
+        "COMMAND_METADATA",
+        {
+            "posts": {
+                "operation_name": "Deleting posts",
+                "strategy_type": "feed",
+                "collection": None,
+                "filter_fn": None,
+            }
+        },
+    )
+    monkeypatch.setattr(
+        commands.registry, "get_all_commands", lambda: {"posts": "only posts"}
+    )
+    monkeypatch.setattr(commands, "COMMAND_EXECUTION_ORDER", ["posts"])
+
+    with pytest.raises(RuntimeError, match="failed while fetching items"):
+        commands.run_all(skip_confirmation=True)
