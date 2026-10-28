@@ -17,7 +17,7 @@ The rest of the dependencies are listed in [pyproject.toml](pyproject.toml).
 Use [`pipx`](https://pipx.pypa.io/latest/installation/) to install `skywipe`:
 
 ```bash
-pipx install git+https://git.kharec.info/Kharec/skywipe.git
+pipx install skywipe
 ```
 
 Run the tool and see available commands with:
