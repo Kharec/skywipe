@@ -1,9 +1,24 @@
 [project]
 name = "skywipe"
 version = "0.1.0"
-description = "Clean your bluesky account"
+description = "Clean your Bluesky account"
+authors = [
+    { name = "Kharec", email = "cazzaniga.sandro@gmail.com" },
+]
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.13"
+keywords = ["bluesky", "atproto", "cli", "cleanup", "wipe"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Utilities",
+]
 dependencies = ["atproto>=0.0.65", "pyyaml>=6.0"]
 
 [project.optional-dependencies]
@@ -12,8 +27,20 @@ dev = ["pytest>=8.0"]
 [project.scripts]
 skywipe = "skywipe.cli:main"
 
+[project.urls]
+Homepage = "https://github.com/Kharec/skywipe"
+Repository = "https://github.com/Kharec/skywipe"
+Issues = "https://github.com/Kharec/skywipe/issues"
+
+[build-system]
+requires = ["uv_build>=0.13.0,<0.14.0"]
+build-backend = "uv_build"
+
 [tool.uv]
 package = true
+
+[tool.uv.build-backend]
+module-root = ""
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
