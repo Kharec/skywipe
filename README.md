@@ -47,7 +47,7 @@ BE SURE TO USE A [BLUESKY APP PASSWORD](https://blueskyfeeds.com/faq-app-passwor
 You can use `uv` to install dependencies:
 
 ```bash
-git clone https://git.kharec.info/Kharec/skywipe.git
+git clone https://github.com/Kharec/skywipe.git
 cd skywipe
 uv sync
 ```
